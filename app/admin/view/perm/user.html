@@ -1,0 +1,98 @@
+{extend name="layout/base" /}
+
+{block name="css"}
+<link rel="stylesheet" href="/assets-admin/js/plugins/sweetalert2/sweetalert2.min.css">
+{/block}
+
+{block name="content"}
+<div class="block">
+    <div class="block-header block-header-default">
+        <h3 class="block-title">用户管理</h3>
+        <div class="block-options">
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle" data-action-mode="demo">
+                <i class="si si-refresh"></i>
+            </button>
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="fullscreen_toggle"></button>
+        </div>
+    </div>
+    <div class="block-content">
+        <p class="font-size-sm text-muted">
+            <a title="新增" icon="fa fa-plus-circle" class="btn btn-primary" href="{:admin_url('perm/userCreate')}"><i class="fa fa-plus-circle"></i> 新增</a>
+            <a title="启用" icon="fa fa-check-circle-o" class="btn btn-success ajax-post confirm" data-form="base-form" data-url="{:admin_url('perm/userBatchUpdate', ['is_seal' => 0])}" href="javascript:void(0)"><i class="fa fa-check-circle-o"></i> 启用</a>
+            <a title="禁用" icon="fa fa-ban" class="btn btn-warning ajax-post confirm" data-form="base-form" data-url="{:admin_url('perm/userBatchUpdate', ['is_seal' => 1])}" href="javascript:void(0)"><i class="fa fa-ban"></i> 禁用</a>
+            <a title="删除" icon="fa fa-times-circle-o" class="btn btn-danger ajax-post confirm" data-form="base-form" data-url="{:admin_url('perm/userBatchDestroy')}" href="javascript:void(0)"><i class="fa fa-times-circle-o"></i> 删除</a>
+        </p>
+        <form class="table-responsive" name="base-form">
+            <table class="table table-bordered table-striped table-vcenter js-table-checkable">
+                <thead>
+                <tr>
+                    <th class="text-center" style="width: 70px;">
+                        <div class="custom-control custom-checkbox custom-control-primary d-inline-block">
+                            <input type="checkbox" class="custom-control-input" id="check-all" name="check-all">
+                            <label class="custom-control-label" for="check-all"></label>
+                        </div>
+                    </th>
+                    <th class="text-center" style="width: 100px;">
+                        <i class="far fa-user"></i>
+                    </th>
+                    <th>用户昵称[登录名]</th>
+                    <th style="width: 30%;">上次登录</th>
+                    <th style="width: 15%;">状态</th>
+                    <th class="text-center" style="width: 100px;">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach $list as $item}
+                <tr>
+                    <td class="text-center">
+                        <div class="custom-control custom-checkbox custom-control-primary d-inline-block">
+                            <input type="checkbox" class="custom-control-input" id="item-{$item.id}" name="ids[]" value="{$item.id}">
+                            <label class="custom-control-label" for="item-{$item.id}"></label>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <img class="img-avatar img-avatar48" src="/assets-admin/media/avatars/avatar7.jpg" alt="">
+                    </td>
+                    <td class="font-w600 font-size-sm">
+                        <a href="{:admin_url('perm/userUpdate', ['id' => $item.id])}">{$item.nickname}[{$item.username}]</a>
+                    </td>
+                    <td class="font-size-sm"></td>
+                    <td>
+                        <div class="custom-control custom-switch custom-control-lg mb-2">
+                            <input type="checkbox" class="custom-control-input" id="is-seal-{$item.id}" data-reverse="1" data-id="{$item.id} "data-field="is_seal" data-url="{:admin_url('perm/userSingleUpdate')}" {if condition="!$item.is_seal"}checked{/if}>
+                            <label class="custom-control-label" for="is-seal-{$item.id}"></label>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        {if condition="$item.id == 1"}
+                        <span class="badge badge-warning">不可编辑</span>
+                        {else}
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-primary go-page" data-url="{:admin_url('perm/userUpdate', ['id' => $item.id])}" data-toggle="tooltip" title="编辑">
+                                <i class="fa fa-fw fa-pencil-alt"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary ajax-get confirm" data-url="{:admin_url('perm/userDestroy', ['id' => $item.id])}" data-toggle="tooltip" title="删除">
+                                <i class="fa fa-fw fa-times"></i>
+                            </button>
+                        </div>
+                        {/if}
+                    </td>
+                </tr>
+                {/foreach}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<!-- Page JS Plugins -->
+<script src="/assets-admin/js/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script src="/assets-admin/js/plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+<script>
+    $(function () {
+        One.helpers(["table-tools-checkable"]);
+    });
+</script>
+{/block}

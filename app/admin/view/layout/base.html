@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>{$project} | 后台管理</title>
+    <link rel="shortcut icon" href="/assets-admin/media/favicons/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets-admin/media/favicons/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets-admin/media/favicons/apple-touch-icon-180x180.png">
+    <!-- END Icons -->
+    {block name="pre-css"}{/block}
+    <link rel="stylesheet" id="css-main" href="/assets-admin/css/oneui.min.css">
+    {block name="css"}{/block}
+    {block name="pre-js"}{/block}
+    <style>
+        .more-text{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+<body>
+<div id="page-container" class="sidebar-o sidebar-dark enable-page-overlay side-scroll page-header-fixed">
+    <nav id="sidebar" aria-label="Main Navigation">
+        <!-- Side Header -->
+        <div class="content-header bg-white-5">
+            <!-- Logo -->
+            <a class="font-w600 text-dual" href="index.html">
+                <i class="fa fa-circle-notch text-primary"></i>
+                <span class="smini-hide">
+                    <span class="font-w700 font-size-h5">Rui</span> <span class="font-w400">{$project}</span>
+                </span>
+            </a>
+            <!-- END Logo -->
+        </div>
+        <!-- END Side Header -->
+
+        <!-- Side Navigation -->
+        <div class="content-side content-side-full">
+            <ul class="nav-main">
+                {if !empty($menus.sidebar_menus)}
+                {foreach $menus.sidebar_menus as $secondMenu}
+                    {if condition="!isset($secondMenu.hide_children) && isset($secondMenu.children)"}
+                    <li class="nav-main-item {if condition="isset($secondMenu.is_active)"}open{/if}">
+                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                            {if condition="$secondMenu.icon"}
+                            <i class="nav-main-link-icon {$secondMenu.icon}"></i>
+                            {/if}
+                            <span class="nav-main-link-name">{$secondMenu.name}</span>
+                        </a>
+                        <ul class="nav-main-submenu">
+                            {foreach $secondMenu.children as $thirdMenu}
+                            <li class="nav-main-item">
+                                <a class="nav-main-link {if condition="isset($thirdMenu.is_active)"}active{/if}" href="{:admin_url($thirdMenu.url)}">
+                                    {if condition="$thirdMenu.icon"}
+                                    <i class="nav-main-link-icon {$thirdMenu.icon}"></i>
+                                    {/if}
+                                    <span class="nav-main-link-name">{$thirdMenu.name}</span>
+                                </a>
+                            </li>
+                            {/foreach}
+                        </ul>
+                    </li>
+                    {else}
+                        <li class="nav-main-item">
+                            <a class="nav-main-link {if condition="isset($secondMenu.is_active)"}active{/if}" href="{:admin_url($secondMenu.url)}">
+                                {if condition="$secondMenu.icon"}
+                                <i class="nav-main-link-icon {$secondMenu.icon}"></i>
+                                {/if}
+                                <span class="nav-main-link-name">{$secondMenu.name}</span>
+                            </a>
+                        </li>
+                    {/if}
+                {/foreach}
+                {/if}
+            </ul>
+        </div>
+        <!-- END Side Navigation -->
+    </nav>
+    <!-- END Sidebar -->
+
+    <!-- Header -->
+    <header id="page-header">
+        <!-- Header Content -->
+        <div class="content-header">
+            <!-- Left Section -->
+            <div class="d-flex align-items-center">
+                <!-- Toggle Sidebar -->
+                <!-- Layout API, functionality initialized in Template._uiApiLayout()-->
+                <button type="button" class="btn btn-sm btn-dual mr-2 d-lg-none" data-toggle="layout" data-action="sidebar_toggle">
+                    <i class="fa fa-fw fa-bars"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-dual mr-2 d-none d-lg-inline-block" data-toggle="layout" data-action="sidebar_mini_toggle">
+                    <i class="fa fa-fw fa-ellipsis-v"></i>
+                </button>
+                {if !empty($menus.top_menus)}
+                {foreach $menus.top_menus as $topMenu}
+                <button type="button" class="btn btn-sm mr-2 d-none d-lg-inline-block {if condition="isset($topMenu.is_active)"} btn-primary {else} btn-dual {/if}" onclick="location.href='{:admin_url($topMenu.url)}'">
+                    <i class="{$topMenu.icon}"></i> {$topMenu.name}
+                </button>
+                {/foreach}
+                {/if}
+                <!-- END Toggle Mini Sidebar -->
+            </div>
+            <!-- END Left Section -->
+
+            <!-- Right Section -->
+            <div class="d-flex align-items-center">
+                <!-- User Dropdown -->
+                <div class="dropdown d-inline-block ml-2">
+                    <button type="button" class="btn btn-sm btn-dual" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img class="rounded" src="/assets-admin/media/avatars/avatar10.jpg" alt="Header Avatar" style="width: 18px;">
+                        <span class="d-none d-sm-inline-block ml-1">{$Request.session.admin.nickname}</span>
+                        <i class="fa fa-fw fa-angle-down d-none d-sm-inline-block"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right p-0 border-0 font-size-sm" aria-labelledby="page-header-user-dropdown">
+                        <div class="p-3 text-center bg-primary">
+                            <img class="img-avatar img-avatar48 img-avatar-thumb" src="/assets-admin/media/avatars/avatar10.jpg" alt="">
+                        </div>
+                        <div class="p-2">
+                            <h5 class="dropdown-header text-uppercase">操作</h5>
+                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="{:admin_url('login/logout')}">
+                                <span>退出登录</span>
+                                <i class="si si-logout ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- END User Dropdown -->
+            </div>
+            <!-- END Right Section -->
+        </div>
+        <!-- END Header Content -->
+
+        <!-- Header Loader -->
+        <!-- Please check out the Loaders page under Components category to see examples of showing/hiding it -->
+        <div id="page-header-loader" class="overlay-header bg-white">
+            <div class="content-header">
+                <div class="w-100 text-center">
+                    <i class="fa fa-fw fa-circle-notch fa-spin"></i>
+                </div>
+            </div>
+        </div>
+        <!-- END Header Loader -->
+
+    </header>
+    <!-- END Header -->
+
+    <!-- Main Container -->
+    <main id="main-container">
+
+        <!-- Hero -->
+        <div class="bg-body-light">
+            <div class="content content-full">
+                <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+                    <h1 class="flex-sm-fill h3 my-2">
+                        Page Layout <small class="font-size-base font-w400 text-muted">Default</small>
+                    </h1>
+                    <nav class="flex-sm-00-auto ml-sm-3" aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-alt">
+                            {if !empty($menus.breadcrumbs)}
+                            {foreach $menus.breadcrumbs as $breadcrumb}
+                            <li class="breadcrumb-item">
+                                {if condition="$breadcrumb.url"}
+                                <a class="link-fx" href="{:admin_url($breadcrumb.url)}">{$breadcrumb.name}</a>
+                                {else}
+                                {$breadcrumb.name}
+                                {/if}
+                            </li>
+                            {/foreach}
+                            {/if}
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <!-- END Hero -->
+
+        <!-- Page Content -->
+        <div class="content">
+            {block name="content"}{/block}
+        </div>
+        <!-- END Page Content -->
+
+    </main>
+    <!-- END Main Container -->
+
+    <!-- Footer -->
+    <footer id="page-footer" class="bg-body-light">
+        <div class="content py-3">
+            <div class="row font-size-sm">
+                <!--<div class="col-sm-6 order-sm-2 py-1 text-center text-sm-right">
+                    Crafted with <i class="fa fa-heart text-danger"></i> by <a class="font-w600" href="#" target="_blank">pixelcave</a>
+                </div>-->
+                <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-left">
+                    <a class="font-w600" href="#" target="_blank">Ruiching</a> &copy; <span data-toggle="year-copy">2022</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- END Footer -->
+</div>
+<!-- END Page Container -->
+
+<script src="/assets-admin/js/oneui.core.min.js"></script>
+<script src="/assets-admin/js/oneui.app.js"></script>
+<script src="/assets-admin/js/page-tools.js"></script>
+{block name="js"}{/block}
+</body>
+</html>

@@ -1,0 +1,76 @@
+{extend name="layout/base" /}
+
+{block name="pre-css"}
+<link rel="stylesheet" href="/assets-admin/js/plugins/select2/css/select2.min.css">
+{/block}
+
+{block name="content"}
+<div class="block">
+    <div class="block-header block-header-default">
+        <h3 class="block-title">编辑用户</h3>
+        <div class="block-options">
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle" data-action-mode="demo">
+                <i class="si si-refresh"></i>
+            </button>
+            <button type="button" class="btn-block-option" data-toggle="block-option" data-action="fullscreen_toggle"></button>
+        </div>
+    </div>
+    <div class="block-content block-content-full">
+        <div class="row">
+            <div class="col-lg-4">
+                <p class="font-size-sm text-muted">
+                    An often used layout which is very easy to create with minimal markup
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <form action="" method="POST">
+                    <div class="form-group">
+                        <label for="roles">所属角色</label>
+                        <select class="js-select2 form-control" id="roles" name="roles[]" style="width: 100%;" data-placeholder="请选择角色" multiple>
+                            <option></option>
+                            {foreach $roles as $role}
+                            <option value="{$role.id}" {if condition="in_array($role.id, $info.role_ids)"} selected {/if}>{$role.nickname}[{$role.name}]</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">用户名</label>
+                        <input type="text" class="form-control form-control-alt" id="username" name="username" value="{$info.username}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" class="form-control form-control-alt" id="password" name="password" placeholder="登录密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="nickname">用户昵称</label>
+                        <input type="text" class="form-control form-control-alt" id="nickname" name="nickname" value="{$info.nickname}" placeholder="用户昵称">
+                    </div>
+                    <div class="form-group">
+                        <label class="d-block">状态</label>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="normal" name="is_seal" value="0" {if condition="!$info.is_seal"} checked {/if}>
+                            <label class="custom-control-label" for="normal">正常</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="seal" name="is_seal" value="1" {if condition="$info.is_seal"} checked {/if}>
+                            <label class="custom-control-label" for="seal">停用</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-dark">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<script src="/assets-admin/js/plugins/select2/js/select2.full.min.js"></script>
+<script>
+    $(function () {
+        One.helpers(["select2"]);
+    });
+</script>
+{/block}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>{$project} | 后台管理</title>
+
+    <link rel="shortcut icon" href="/assets-admin/media/favicons/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets-admin/media/favicons/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets-admin/media/favicons/apple-touch-icon-180x180.png">
+
+    {block name="pre-css"}{/block}
+    <link rel="stylesheet" id="css-main" href="/assets-admin/css/oneui.min.css">
+
+    {block name="css"}{/block}
+    {block name="pre-js"}{/block}
+</head>
+<body>
+
+<div id="page-container" class="sidebar-o sidebar-dark enable-page-overlay side-scroll page-header-fixed" style="padding: 0">
+
+    <!-- Main Container -->
+    <main id="main-container" style="width: 100%;padding: 0">
+
+        <!-- Page Content -->
+        <div class="content">
+            {block name="content"}{/block}
+        </div>
+        <!-- END Page Content -->
+    </main>
+    <!-- END Main Container -->
+
+</div>
+<!-- END Page Container -->
+
+<script src="/assets-admin/js/oneui.core.min.js"></script>
+<script src="/assets-admin/js/oneui.app.js"></script>
+<script src="/assets-admin/js/page-tools.js"></script>
+{block name="js"}{/block}
+</body>
+</html>

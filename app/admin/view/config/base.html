@@ -1,0 +1,243 @@
+{extend name="layout/base" /}
+
+{block name="pre-css"}
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="/assets-admin/js/plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="/assets-admin/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
+<style>
+    .btn-copy-link {
+        cursor: pointer;
+    }
+    span.btn-copy-link {
+        color: #5c80d1;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<!-- Block Tabs Alternative Style -->
+<div class="col-lg-12">
+    <div class="block">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">项目设置</h3>
+            <div class="block-options">
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle" data-action-mode="demo">
+                    <i class="si si-refresh"></i>
+                </button>
+                <button type="button" class="btn-block-option" data-toggle="block-option" data-action="fullscreen_toggle"></button>
+            </div>
+        </div>
+        <div class="block-content block-content-full">
+
+            <form action="" method="POST">
+                <!-- Block Tabs Alternative Style -->
+                <div class="block">
+                    <ul class="nav nav-tabs nav-tabs-alt" data-toggle="tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#btabs-alt-static-open">小程序配置</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#btabs-alt-static-tencent">阿里云配置</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#btabs-alt-static-yewu">猫酷CRM配置</a>
+                        </li>
+                    </ul>
+                    <div class="block-content tab-content">
+
+                        <!--微信开放平台-->
+                        <div class="tab-pane active" id="btabs-alt-static-open" role="tabpanel">
+                            <div class="form-group">
+                                <label>小程序APP_ID</label>
+                                <div class="input-group">
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control form-control-alt" name="wx_mini_app_id" value="{$configs['wx_mini_app_id'] ?? ''}" placeholder="APP_ID">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>小程序APP_SECRET</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="wx_mini_app_secret" value="{$configs['wx_mini_app_secret'] ?? ''}" placeholder="APP_SECRET">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>小程序版本</label>
+                                <div class="input-group">
+                                    <div class="col-sm-3">
+                                        <select class="form-control" name="wx_mini_env_version">
+                                            {if isset($configs['wx_mini_env_version'])}
+                                            <option value="release" {if $configs['wx_mini_env_version'] == "release"}selected{/if}>正式版</option>
+                                            <option value="trial" {if $configs['wx_mini_env_version'] == "trial"}selected{/if}>体验版</option>
+                                            <option value="develop" {if $configs['wx_mini_env_version'] == "develop"}selected{/if}>开发版</option>
+                                            {else}
+                                            <option value="release">正式版</option>
+                                            <option value="trial">体验版</option>
+                                            <option value="develop">开发版</option>
+                                            {/if}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>小程序页面检测</label>
+                                <div class="input-group">
+                                    <div class="col-sm-3">
+                                        <select class="form-control" name="wx_mini_check_path">
+                                            {if isset($configs['wx_mini_env_version'])}
+                                            <option value="0" {if $configs['wx_mini_check_path'] == 0}selected{/if}>关闭</option>
+                                            <option value="1" {if $configs['wx_mini_check_path'] == 1}selected{/if}>开启</option>
+                                            {else}
+                                            <option value="0">关闭</option>
+                                            <option value="1">开启</option>
+                                            {/if}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h2 class="content-heading border-bottom mb-4 pb-2">业务配置</h2>
+                            <div class="form-group">
+                                <label>小程序 - 启动页面地址</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="wx_mini_start_page_url" value="{$configs['wx_mini_start_page_url'] ?? ''}" placeholder="启动页面地址">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>小程序 - Phone页面地址</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="wx_mini_photo_page_url" value="{$configs['wx_mini_photo_page_url'] ?? ''}" placeholder="图片的展示页面地址">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>启动二维码过期时间(秒)</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="device_start_qr_expired_sec" value="{$configs['device_start_qr_expired_sec'] ?? ''}" placeholder="启动二维码过期时间">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--存储配置-->
+                        <div class="tab-pane" id="btabs-alt-static-tencent" role="tabpanel">
+                            <div class="form-group">
+                                <label>AccessKey_ID</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="ali_access_key_id" value="{$configs['ali_access_key_id'] ?? ''}" placeholder="AccessKey_ID">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>AccessKey_Secret</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="ali_access_key_secret" value="{$configs['ali_access_key_secret'] ?? ''}" placeholder="AccessKey_Secret">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h2 class="content-heading border-bottom mb-4 pb-2">OSS配置</h2>
+                            <div class="form-group">
+                                <label>Bucket</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="ali_oss_bucket_name" value="{$configs['ali_oss_bucket_name'] ?? ''}" placeholder="Bucket">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Endpoint</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="ali_oss_endpoint" value="{$configs['ali_oss_endpoint'] ?? ''}" placeholder="Endpoint">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>访问域名</label>
+                                <div class="input-group">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control form-control-alt" name="ali_oss_domain_url" value="{$configs['ali_oss_domain_url'] ?? ''}" placeholder="访问域名">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                       <!-- 业务配置-->
+                        <div class="tab-pane" id="btabs-alt-static-yewu" role="tabpanel">
+                            <div class="form-group">
+                                <label>应用ID</label>
+                                <div class="input-group">
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control form-control-alt" name="mallcoo_app_id" value="{$configs['mallcoo_app_id'] ?? ''}" placeholder="应用ID（由猫酷统一分配）">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>公钥</label>
+                                <div class="input-group">
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control form-control-alt" name="mallcoo_public_key" value="{$configs['mallcoo_public_key'] ?? ''}" placeholder="公钥（由猫酷统一分配）">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>私钥</label>
+                                <div class="input-group">
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control form-control-alt" name="mallcoo_private_key" value="{$configs['mallcoo_private_key'] ?? ''}" placeholder="私钥（由猫酷统一分配）">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-right">
+                            <button type="submit" class="btn btn-dark">提交</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Block Tabs Alternative Style -->
+            </form>
+
+        </div>
+    </div>
+</div>
+{/block}
+
+
+{block name="js"}
+<script src="/assets-admin/js/plugins/layer/layer.js"></script>
+<script src="/assets-admin/js/plugins/jquery.maskedinput/jquery.maskedinput.min.js"></script>
+<script src="/assets-admin/js/plugins/clipboard/clipboard.min.js"></script>
+<script src="/assets-admin/js/plugins/select2/js/select2.full.min.js"></script>
+<script src="/assets-admin/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+<script>jQuery(function(){ One.helpers(['masked-inputs', 'select2', 'datepicker']); });</script>
+<script>
+    $(function () {
+        new Clipboard('.btn-copy-link');
+        $('.btn-copy-link').click(function (e) {
+            layer.msg("复制成功");
+        });
+    })
+</script>
+{/block}
