@@ -174,12 +174,13 @@ class BaseSeeder extends Seeder
         $server = new \app\service\ExcelService();
 
         //导入文件
+        $eventIds = [];
         foreach ($fileConfigs as $fileConfig) {
             $this->query('TRUNCATE TABLE '. $fileConfig['table']);
             $excelResult = $server->import($filePath, $fileConfig['sheet']);
             if (!empty($excelResult)) {
                 $insertData = [];
-                foreach ($excelResult as $item) {
+                foreach ($excelResult as $k => $item) {
                     $insertItem = [];
                     foreach ($fileConfig['field'] as $field => $key) {
                         if (isset($item[$key[0]]) && !empty($item[$key[0]])) {
@@ -188,6 +189,12 @@ class BaseSeeder extends Seeder
                                 $insertItem[$field] = intval($item[$key[0]]);
                             }
                         }
+                    }
+                    if ($fileConfig['sheet'] == 'event') {
+                        $eventIds[] = $insertItem['event_id'];
+                    }
+                    if ($fileConfig['sheet'] == 'Event__Field' && isset($eventIds[$k])) {
+                        $insertItem['event_id'] = $eventIds[$k];
                     }
                     $insertData[] = $insertItem;
                 }
