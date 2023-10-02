@@ -7,11 +7,23 @@ use Pimple\Container;
 /**
  * Class BaseRepository
  *
- * @property \app\model\Admin $adminModel
- * @property \app\model\AdminRole $adminRoleModel
- * @property \app\model\AdminRoleMap $adminRoleMapModel
- * @property \app\model\HandleLog $handleLogModel
- * @property \app\model\Configs $configsModel
+ * @property \app\model\Event $eventModel
+ * @property \app\model\EventEvolveTheme $eventEvolveThemeModel
+ * @property \app\model\EventField $eventFieldModel
+ * @property \app\model\EventQuality $eventQualityModel
+ * @property \app\model\EventReference $eventReferenceModel
+ * @property \app\model\EventRelation $eventRelationModel
+ * @property \app\model\EventRelationReference $eventRelationReferenceModel
+ * @property \app\model\EventSubject $eventSubjectModel
+ * @property \app\model\EventTag $eventTagModel
+ * @property \app\model\Field $fieldModel
+ * @property \app\model\FormatedLocation $formatedLocationModel
+ * @property \app\model\Literature $literatureModel
+ * @property \app\model\LiteratureTextualContent $literatureTextualContentModel
+ * @property \app\model\RawEvent $rawEventModel
+ * @property \app\model\Reference $referenceModel
+ * @property \app\model\Subject $subjectModel
+ * @property \app\model\Tag $tagModel
  *
  */
 class BaseRepository extends Container
