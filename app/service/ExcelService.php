@@ -2,6 +2,8 @@
 
 namespace app\service;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 class ExcelService
 {
 
@@ -61,29 +63,37 @@ class ExcelService
     }
 
     //数据导入
-    public function import($file)
+    public function import($file, $sheetName = '')
     {
-        $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
-        $cacheSettings = array('memoryCacheSize' => '16MB');
-        \PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);//文件缓存
-        //当前空间不用\，非当前空间要加\
-        $PHPExcel = new \PHPExcel();//创建一个excel对象
-        $PHPReader = new \PHPExcel_Reader_Excel2007(); //建立reader对象，excel—2007以后格式
-        if (!$PHPReader->canRead($file)) {
-            $PHPReader = new \PHPExcel_Reader_Excel5();//建立reader对象，excel—2007以前格式
-            if (!$PHPReader->canRead($file)) {
-                return false;
-            }
+        // 有Xls和Xlsx格式两种
+        $fileArr = explode('.', $file);
+        $fileExt = $fileArr[count($fileArr) - 1];
+        if ($fileExt == 'xls') {
+            $reader = IOFactory::createReader('Xls'); //加载excel对象
+        } else {
+            $reader = IOFactory::createReader('Xlsx'); //加载excel对象
         }
-
-        $PHPExcel = $PHPReader->load($file); //加载excel对象
-        $sheet = $PHPExcel->getSheet(0); //获取指定的sheet表
+        $PHPExcel = $reader->load($file);
+        $sheet = $PHPExcel->getSheetByName($sheetName); //获取指定的sheet表
         $rows = $sheet->getHighestRow();//行数
         $cols = $sheet->getHighestColumn();//列数
 
-        $data = array();
+        $data = [];
+        $fieldName = [];
+        //循环第一行，获取字段名
+        for ($fj = 'A'; $fj <= $cols; $fj++) { //列数是以A列开始
+            $value = $sheet->getCell($fj . '1')->getValue();
+            if(empty($value)) {
+                $value = null;
+            }else{
+                $value = (string)trim($sheet->getCell($fj . '1')->getValue());
+            }
+            $fieldName[$fj] = $value;
+        }
+
+
         for ($i = 2; $i <= $rows; $i++){ //行数是以第1行开始
-            $count = 0;
+            $dataItem = [];
             for ($j = 'A'; $j <= $cols; $j++) { //列数是以A列开始
                 $value = $sheet->getCell($j . $i)->getValue();
                 if(empty($value)) {
@@ -91,9 +101,9 @@ class ExcelService
                 }else{
                     $value = (string)$sheet->getCell($j . $i)->getValue();
                 }
-                $data[$i - 1][$count] = $value;
-                $count += 1;
+                $dataItem[$fieldName[$j]]= $value;
             }
+            $data[] = $dataItem;
         }
         return $data;
     }
