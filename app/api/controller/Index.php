@@ -16,6 +16,7 @@ class Index extends BaseController
     public function __construct(App $app)
     {
         parent::__construct($app);
+        header('Access-Control-Allow-Origin:*');
         $this->repository = new IndexRepository();
     }
 
