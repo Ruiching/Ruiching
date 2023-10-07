@@ -20,24 +20,62 @@ class Index extends BaseController
         $this->repository = new IndexRepository();
     }
 
+    /**
+     * 获取时间轴
+     * @param Request $request
+     * @return array
+     */
     public function times(Request $request)
     {
         $times = $this->repository->getAllTime($request::param());
         return success('时间轴', $times);
     }
 
+    /**
+     * 获取学科
+     * @param Request $request
+     * @return array
+     */
     public function fields(Request $request)
     {
         $fields = $this->repository->getAllFields($request::param());
         return success('学科列表', $fields);
     }
 
-    public function events(Request $request)
+    /**
+     * 获取人物
+     * @param Request $request
+     * @return array
+     */
+    public function subject(Request $request)
     {
-        $lists = $this->repository->getEventList($request::param());
-        return success('事件列表', $lists);
+        $fields = $this->repository->getAllSubject($request::param());
+        return success('人物列表', $fields);
     }
 
+    /**
+     * 获取事件
+     * @param Request $request
+     * @return array
+     */
+    public function events(Request $request)
+    {
+        if (Request::isPost()){
+            $lists = $this->repository->getEventList($request::param());
+            if (empty($lists)) {
+                return error($this->repository->getErrorMsg(), $this->repository->getErrorCode());
+            }
+            return success('事件列表', $lists);
+        }else{
+            return error('非法请求');
+        }
+    }
+
+    /**
+     * 获取演进关系
+     * @param Request $request
+     * @return array
+     */
     public function evolve(Request $request)
     {
         if (Request::isPost()){
