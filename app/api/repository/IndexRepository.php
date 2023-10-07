@@ -48,11 +48,11 @@ class IndexRepository extends BaseRepository
         }
 
         //上级学科筛选
-        if (isset($params['level_0']) && !empty($params['level_0'])) {
-            $query = $query->where('level_0_name', $params['level_0']);
-        }
         if (isset($params['level_1']) && !empty($params['level_1'])) {
-            $query = $query->where('level_1_name', $params['level_1']);
+            $query = $query->where('level_0_name', $params['level_1']);
+        }
+        if (isset($params['level_2']) && !empty($params['level_2'])) {
+            $query = $query->where('level_1_name', $params['level_2']);
         }
 
         //时间筛选
@@ -166,10 +166,16 @@ class IndexRepository extends BaseRepository
                 $evolveInfo = $this->eventEvolveThemeModel->where('event_id', $item['event_id'])->find();
                 //获取关联的学科信息
                 $fieldInfo = $this->eventFieldModel->where('event_id', $item['event_id'])->order('id', 'desc')->find();
+                //年份数据
+                $year = $item['min_year'];
+                if (isset($params['start_time']) && !empty($params['start_time']) && $params['start_time'] > $item['min_year']) {
+                    $year = $params['start_time'];
+                }
 
                 //整理数据
                 $eventItem = [
                     'event_id' => $item['event_id'],
+                    'year' => $year,
                     'time' => $item['time'],
                     'name' => $item['name'],
                     'field' => [
