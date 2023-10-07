@@ -14,6 +14,8 @@ class CreateEvent extends Migrator
             ->addColumn('object_attributive', 'string', ['limit' => 128, 'default' => '', 'comment' => '事件对象描述'])
             ->addColumn('object', 'string', ['limit' => 128, 'default' => '', 'comment' => '对象'])
             ->addColumn('time', 'string', ['limit' => 32, 'default' => '', 'comment' => '发生时间'])
+            ->addColumn('min_year', 'integer', ['default' => 0, 'comment' => '发生年份'])
+            ->addColumn('max_year', 'integer', ['default' => 0, 'comment' => '发生年份'])
             ->addColumn('formated_time', 'string', ['limit' => 32, 'default' => '', 'comment' => '归一化后的发生时间,最粗精确到年份,最细精确到日期;'])
             ->addColumn('time_granularity', 'integer', ['default' => 0, 'comment' => '时间精确度,天(1),月(31),年(376)'])
             ->addColumn('timestamp', 'integer', ['default' => 0, 'comment' => '自定义时间戳,用于排序'])

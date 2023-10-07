@@ -14,14 +14,24 @@ class IndexRepository extends BaseRepository
 
     public function getAllTime($params)
     {
-        $query = $this->eventModel->order('timestamp desc');
+        $query = $this->eventModel->group('min_year')->order('min_year desc');
         if (isset($params['start_time']) && !empty($params['start_time'])) {
-            $query = $query->where('timestamp', '>=', $params['start_time']);
+            $query = $query->where('min_year', '>=', $params['start_time']);
         }
         if (isset($params['end_time']) && !empty($params['end_time'])) {
-            $query = $query->where('timestamp', '<=', $params['end_time']);
+            $query = $query->where('max_year', '<=', $params['end_time']);
         }
-        return $query->field('time, timestamp')->select();
+        $times = [];
+        $lists = $query->field('min_year')->select();
+        if (!empty($lists)) {
+            foreach ($lists as $item) {
+                $times[] = [
+                    'time' => $item['min_year'] . '年',
+                    'year' => $item['min_year'],
+                ];
+            }
+        }
+        return $times;
     }
 
     public function getAllFields($params)
@@ -48,10 +58,10 @@ class IndexRepository extends BaseRepository
         $events = [];
         $query = $this->eventModel->order('timestamp desc');
         if (isset($params['start_time']) && !empty($params['start_time'])) {
-            $query = $query->where('timestamp', '>=', $params['start_time']);
+            $query = $query->where('min_year', '>=', $params['start_time']);
         }
         if (isset($params['end_time']) && !empty($params['end_time'])) {
-            $query = $query->where('timestamp', '<=', $params['end_time']);
+            $query = $query->where('max_year', '<=', $params['end_time']);
         }
         $level = empty($params['field_level']) ? 1 : $params['field_level'];
         if (isset($params['field']) && !empty($params['field'])) {

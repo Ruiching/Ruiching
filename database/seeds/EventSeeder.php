@@ -14,7 +14,7 @@ class EventSeeder extends Seeder
      */
     public function run()
     {
-        $filePath = root_path() . 'view/10-07.xlsx';
+        $filePath = root_path() . 'view/09-26.xlsx';
         var_dump($filePath);
         $fileConfigs = [
             [
@@ -60,12 +60,54 @@ class EventSeeder extends Seeder
                             }
                         }
                     }
+                    //处理event中的年份
                     if ($fileConfig['sheet'] == 'event') {
-                        $eventIds[] = $insertItem['event_id'];
+                        $timeArr = explode('年', $insertItem['time']);
+                        $insertItem['min_year'] = $timeArr[0];
+                        $insertItem['max_year'] = $timeArr[0];
+
+                        if (strpos($timeArr[0], '～') !== false) {
+                            $timeArr = explode('～', $timeArr[0]);
+                            $insertItem['min_year'] = $timeArr[0];
+                            $insertItem['max_year'] = $timeArr[1];
+                        }
+                        if (strpos($timeArr[0], '-') !== false) {
+                            $timeArr = explode('-', $timeArr[0]);
+                            $insertItem['min_year'] = $timeArr[0];
+                            $insertItem['max_year'] = $timeArr[1];
+                        }
+                        if (strpos($timeArr[0], '世纪') !== false) {
+                            if (strpos($timeArr[0], '世纪中叶') !== false) {
+                                $timeArr = explode('世纪', $timeArr[0]);
+                                $minYear = ($timeArr[0] - 1) * 100 + 40;
+                                $maxYear = ($timeArr[0] - 1) * 100 + 60;
+                                $insertItem['min_year'] = $minYear;
+                                $insertItem['max_year'] = $maxYear;
+                            } else {
+                                $timeArr = explode('世纪', $timeArr[0]);
+                                $year = ($timeArr[0] - 1) * 100 + $timeArr[1];
+                                $insertItem['min_year'] = $year;
+                                $insertItem['max_year'] = $year;
+                            }
+                        }
+                        if (strpos($timeArr[0], '公元') !== false && strpos($timeArr[0], '公元前') === false) {
+                            $timeArr = explode('公元', $timeArr[0]);
+                            $insertItem['min_year'] = $timeArr[1];
+                            $insertItem['max_year'] = $timeArr[1];
+                        }
+                        if (strpos($timeArr[0], '公元前') !== false) {
+                            $timeArr = explode('公元前', $timeArr[0]);
+                            $insertItem['min_year'] = '-' . $timeArr[1];
+                            $insertItem['max_year'] = '-' . $timeArr[1];
+                        }
                     }
-                    if ($fileConfig['sheet'] == 'Event__Field' && isset($eventIds[$k])) {
-                        $insertItem['event_id'] = $eventIds[$k];
-                    }
+
+//                    if ($fileConfig['sheet'] == 'event') {
+//                        $eventIds[] = $insertItem['event_id'];
+//                    }
+//                    if ($fileConfig['sheet'] == 'Event__Field' && isset($eventIds[$k])) {
+//                        $insertItem['event_id'] = $eventIds[$k];
+//                    }
                     $insertData[] = $insertItem;
                 }
                 $this->table($fileConfig['table'])->insert($insertData)->saveData();
