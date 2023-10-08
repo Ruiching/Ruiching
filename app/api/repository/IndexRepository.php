@@ -113,10 +113,10 @@ class IndexRepository extends BaseRepository
 
         //时间筛选
         if (isset($params['start_time']) && !empty($params['start_time'])) {
-            $query = $query->where('max_year', '<=', $params['start_time']);
+            $query = $query->where('max_year', '>=', $params['start_time']);
         }
         if (isset($params['end_time']) && !empty($params['end_time'])) {
-            $query = $query->where('min_year', '>=', $params['end_time']);
+            $query = $query->where('min_year', '<=', $params['end_time']);
         }
 
         //学科筛选
