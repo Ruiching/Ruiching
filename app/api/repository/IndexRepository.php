@@ -178,6 +178,7 @@ class IndexRepository extends BaseRepository
                     'year' => $year,
                     'time' => $item['time'],
                     'name' => $item['name'],
+                    'object' => $item['object'],
                     'field' => [
                         'full_name' => empty($fieldInfo) ? "" : $fieldInfo['full_name'],
                         'level_0' => empty($fieldInfo) ? "" : $fieldInfo['level_0_name'],
