@@ -16,10 +16,10 @@ class IndexRepository extends BaseRepository
     {
         $query = $this->eventModel->group('min_year')->order('min_year', 'desc');
         if (isset($params['start_time']) && !empty($params['start_time'])) {
-            $query = $query->where('max_year', '<=', $params['start_time']);
+            $query = $query->where('max_year', '>=', $params['start_time']);
         }
         if (isset($params['end_time']) && !empty($params['end_time'])) {
-            $query = $query->where('min_year', '>=', $params['end_time']);
+            $query = $query->where('min_year', '<=', $params['end_time']);
         }
         $times = [];
         $lists = $query->field('min_year')->select();
@@ -59,10 +59,10 @@ class IndexRepository extends BaseRepository
         if ( (isset($params['start_time']) && !empty($params['start_time'])) || (isset($params['end_time']) && !empty($params['end_time'])) ) {
             $eventQuery = $this->eventModel;
             if (isset($params['start_time']) && !empty($params['start_time'])) {
-                $eventQuery = $eventQuery->where('max_year', '<=', $params['start_time']);
+                $eventQuery = $eventQuery->where('max_year', '>=', $params['start_time']);
             }
             if (isset($params['end_time']) && !empty($params['end_time'])) {
-                $eventQuery = $eventQuery->where('min_year', '>=', $params['end_time']);
+                $eventQuery = $eventQuery->where('min_year', '<=', $params['end_time']);
             }
             $eventIds = $eventQuery->column('event_id');
             if (!empty($eventIds)) {
@@ -81,10 +81,10 @@ class IndexRepository extends BaseRepository
         if ( (isset($params['start_time']) && !empty($params['start_time'])) || (isset($params['end_time']) && !empty($params['end_time'])) ) {
             $eventQuery = $this->eventModel;
             if (isset($params['start_time']) && !empty($params['start_time'])) {
-                $eventQuery = $eventQuery->where('max_year', '<=', $params['start_time']);
+                $eventQuery = $eventQuery->where('max_year', '>=', $params['start_time']);
             }
             if (isset($params['end_time']) && !empty($params['end_time'])) {
-                $eventQuery = $eventQuery->where('min_year', '>=', $params['end_time']);
+                $eventQuery = $eventQuery->where('min_year', '<=', $params['end_time']);
             }
             $eventIds = $eventQuery->column('event_id');
             if (!empty($eventIds)) {
