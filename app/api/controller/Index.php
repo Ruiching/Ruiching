@@ -62,9 +62,6 @@ class Index extends BaseController
     {
         if (Request::isPost()){
             $lists = $this->repository->getEventList($request::param());
-            if (empty($lists)) {
-                return error($this->repository->getErrorMsg(), $this->repository->getErrorCode());
-            }
             return success('事件列表', $lists);
         }else{
             return error('非法请求');
