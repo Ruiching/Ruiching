@@ -210,6 +210,7 @@ class IndexRepository extends BaseRepository
                     'event_id' => $item['event_id'],
                     'time' => $item['time'],
                     'name' => $item['name'],
+                    'object' => $item['object'],
                     'next_event_id' => empty($nextEventId) ? "" : $nextEventId,
                 ];
                 $events[] = $eventItem;
