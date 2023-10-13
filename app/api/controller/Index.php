@@ -49,7 +49,7 @@ class Index extends BaseController
      */
     public function subject(Request $request)
     {
-        $fields = $this->repository->getAllSubject();
+        $fields = $this->repository->getAllSubject($request::param());
         return success('人物列表', $fields);
     }
 

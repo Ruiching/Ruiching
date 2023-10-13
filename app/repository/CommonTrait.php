@@ -26,7 +26,9 @@ trait CommonTrait
                 $year = ($timeArr[0] - 1) * 100 + 40;
             } else {
                 $timeArr = explode('世纪', $year);
-                $year = ($timeArr[0] - 1) * 100 + $timeArr[1];
+                $first = ($timeArr[0] - 1) * 100;
+                $second = empty($timeArr[1]) ? 0 : $timeArr[1];
+                $year = $first + $second;
             }
         }
         if (strpos($year, '公元') !== false && strpos($year, '公元前') === false) {
@@ -38,6 +40,248 @@ trait CommonTrait
             $year = '-' . $timeArr[1];
         }
         return $year;
+    }
+
+    public function _queryAllEventV1($params)
+    {
+        $query = $this->eventModel
+            ->where('timestamp', '>', 0)
+            ->where('formated_time', '<', '2060年');
+
+        //时间筛选
+        if (empty($params['time'])) {
+            $params['time'] = date('Y', time());
+        }
+        $query = $query->whereLike('formated_time', "%{$params['time']}年%");
+
+        //学科筛选
+        if (isset($params['field']) && !empty($params['field'])) {
+            $fieldEventIds = $this->eventFieldModel
+                ->whereLike('level_1_name', $params['field'])
+                ->column('event_id');
+            if (!empty($fieldEventIds)) {
+                $query = $query->whereIn('event_id', $fieldEventIds);
+            }
+        }
+
+        //人物筛选
+        if (isset($params['people']) && !empty($params['people'])) {
+            $subjectIds = $this->subjectModel
+                ->whereLike('name', "%{$params['people']}%")
+                ->column('subject_id');
+            $subjectEventIds = $this->eventSubjectModel
+                ->whereIn('subject_id', $subjectIds)
+                ->column('event_id');
+            if (!empty($subjectEventIds)) {
+                $query = $query->whereIn('event_id', $subjectEventIds);
+            }
+        }
+
+        //关键词筛选
+        if (isset($params['keyword']) && !empty($params['keyword'])) {
+            //事件名称
+            $query = $query->whereLike('name|object', "%{$params['keyword']}%");
+
+            //演进关系
+            $themeEventIds = $this->eventEvolveThemeModel
+                ->whereLike('theme', "%{$params['keyword']}%")
+                ->column('event_id');
+            if (!empty($subjectEventIds)) {
+                $query = $query->whereOr('event_id', 'in', $themeEventIds);
+            }
+        }
+
+        //查询到的所有事件
+        return $query->order('timestamp', 'asc')->column('event_id');
+    }
+
+    public function _queryAllEventV2($maxNumber, $params)
+    {
+        $query = $this->eventModel
+            ->where('timestamp', '>', 0)
+            ->where('formated_time', '<', '2060年');
+
+        //时间筛选
+        if (empty($params['time'])) {
+            $params['time'] = date('Y', time());
+        }
+        $query = $query->whereLike('formated_time', "%{$params['time']}年%");
+
+        //学科筛选
+        if (isset($params['field']) && !empty($params['field'])) {
+            $fieldEventIds = $this->eventFieldModel
+                ->whereLike('level_1_name', $params['field'])
+                ->column('event_id');
+            if (!empty($fieldEventIds)) {
+                $query = $query->whereIn('event_id', $fieldEventIds);
+            }
+        }
+
+        //人物筛选
+        if (isset($params['people']) && !empty($params['people'])) {
+            $subjectIds = $this->subjectModel
+                ->whereLike('name', "%{$params['people']}%")
+                ->column('subject_id');
+            $subjectEventIds = $this->eventSubjectModel
+                ->whereIn('subject_id', $subjectIds)
+                ->column('event_id');
+            if (!empty($subjectEventIds)) {
+                $query = $query->whereIn('event_id', $subjectEventIds);
+            }
+        }
+
+        //关键词筛选
+        if (isset($params['keyword']) && !empty($params['keyword'])) {
+            //事件名称
+            $query = $query->whereLike('name|object', "%{$params['keyword']}%");
+
+            //演进关系
+            $themeEventIds = $this->eventEvolveThemeModel
+                ->whereLike('theme', "%{$params['keyword']}%")
+                ->column('event_id');
+            if (!empty($subjectEventIds)) {
+                $query = $query->whereOr('event_id', 'in', $themeEventIds);
+            }
+        }
+
+        //查询到的所有事件
+        $timestamp = $query->order('timestamp', 'asc')->value('timestamp');
+
+        $upEventIds = $this->eventModel
+            ->where('timestamp', '>=', $timestamp)
+            ->order('timestamp', 'asc')
+            ->limit(0, floor($maxNumber / 2))
+            ->column('event_id');
+
+        $downEventIds = $this->eventModel
+            ->where('timestamp', '<', $timestamp)
+            ->order('timestamp', 'desc')
+            ->limit(0, floor($maxNumber / 2))
+            ->column('event_id');
+
+        return array_merge($upEventIds, $downEventIds);
+    }
+
+    public function _handlerEvent($list, $minTime, $maxTime, $eventId)
+    {
+        //查询事件
+        $eventInfo = $this->eventModel->where('event_id', $eventId)->find();
+
+        //下一级事件
+        $childEventId = $this->eventRelationModel
+            ->where('target_event_id', $eventId)
+            ->value('source_event_id');
+
+        //上一级事件
+        $parentEventId = $this->eventRelationModel
+            ->where('source_event_id', $eventId)
+            ->value('target_event_id');
+
+        //查找是否存在于演进主题中
+        $evolveTheme = $this->eventEvolveThemeModel
+            ->where('event_id', $eventId)
+            ->value('theme');
+
+        //获取关联的学科信息
+        $field = $this->eventFieldModel
+            ->where('event_id', $eventId)
+            ->order('id', 'desc')
+            ->value('level_1_name');
+
+        //年份数据
+        if (empty($minTime['sort'])) {
+            $minTime = [
+                'year' => $eventInfo['formated_time'],
+                'sort' => $eventInfo['timestamp'],
+            ];
+        }
+        if (empty($maxTime['sort'])) {
+            $maxTime = [
+                'year' => $eventInfo['formated_time'],
+                'sort' => $eventInfo['timestamp'],
+            ];
+        }
+        if ($minTime['sort'] > $eventInfo['timestamp']) {
+            $minTime = [
+                'year' => $eventInfo['formated_time'],
+                'sort' => $eventInfo['timestamp'],
+            ];
+        }
+        if ($maxTime['sort'] < $eventInfo['timestamp']) {
+            $maxTime = [
+                'year' => $eventInfo['formated_time'],
+                'sort' => $eventInfo['timestamp'],
+            ];
+        }
+
+        //整理数据
+        $eventItem = [
+            'event_id' => $eventInfo['event_id'],
+            'year' => $this->_handlerEventTimeToYear($eventInfo['formated_time']),
+            'time' => $eventInfo['time'],
+            'name' => $eventInfo['name'],
+            'object' => $eventInfo['object'],
+            'field' => $field,
+            'relation' => [
+                'parent' => empty($parentEventId) ? '' : $parentEventId,
+                'child' => empty($childEventId) ? '' : $childEventId,
+            ],
+            'evolve_info' => [
+                'has' => !empty($evolveTheme),
+                'theme' => empty($evolveTheme) ? "" : $evolveTheme,
+            ],
+        ];
+
+        $list[] = $eventItem;
+        return [ $list, $minTime, $maxTime ];
+    }
+
+    public function _getChildrenEvent($maxNumber, $list, $minTime, $maxTime, $eventId)
+    {
+        //够数量，直接返回
+        if (count($list) >= $maxNumber) {
+            return [ $list, $minTime, $maxTime ];
+        }
+
+        //查找事件
+        $childrenEventId = $this->eventRelationModel
+            ->where('target_event_id', $eventId)
+            ->value('source_event_id');
+
+        //没有事件，直接返回
+        if (empty($childrenEventId)) {
+            return [ $list, $minTime, $maxTime ];
+        }
+
+        //处理事件
+        list($list, $minTime, $maxTime) = $this->_handlerEvent($list, $minTime, $maxTime, $childrenEventId);
+
+        //递归查询
+        return $this->_getChildrenEvent($maxNumber, $list, $minTime, $maxTime, $childrenEventId);
+    }
+
+    public function _getParentEvent($maxNumber, $list, $minTime, $maxTime, $eventId)
+    {
+        //够数量，直接返回
+        if (count($list) >= $maxNumber) {
+            return [ $list, $minTime, $maxTime ];
+        }
+
+        //查找事件
+        $parentEventId = $this->eventRelationModel
+            ->where('source_event_id', $eventId)
+            ->value('target_event_id');
+
+        //没有事件，直接返回
+        if (empty($parentEventId)) {
+            return [ $list, $minTime, $maxTime ];
+        }
+
+        //处理事件
+        list($list, $minTime, $maxTime) = $this->_handlerEvent($list, $minTime, $maxTime, $parentEventId);
+
+        //递归查询
+        return $this->_getParentEvent($maxNumber, $list, $minTime, $maxTime, $parentEventId);
     }
 
     public function _getNextEvent($eventId, $checkEventIds)

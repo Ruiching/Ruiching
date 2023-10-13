@@ -15,12 +15,16 @@ class IndexRepository extends BaseRepository
     public function getAllTime()
     {
         $startTime = $this->eventModel
+            ->where('timestamp', '>', 0)
+            ->where('formated_time', '<', '2060年')
             ->order('timestamp', 'asc')
-            ->value('time');
+            ->value('formated_time');
 
         $endTime = $this->eventModel
+            ->where('timestamp', '>', 0)
+            ->where('formated_time', '<', '2060年')
             ->order('timestamp', 'desc')
-            ->value('time');
+            ->value('formated_time');
 
         $startYear = $this->_handlerEventTimeToYear($startTime);
         $endYear = $this->_handlerEventTimeToYear($endTime);
@@ -48,14 +52,14 @@ class IndexRepository extends BaseRepository
                     ->column('level_1_name');
                 if (!empty($childrenField)) {
                     foreach ($childrenField as $value) {
-                        $childrenList = [
+                        $childrenList[] = [
                             'field' => $value,
                         ];
                     }
                 }
 
                 $fieldItem = [
-                    'field' => $oneList,
+                    'field' => $oneLevel,
                     'children' => $childrenList
                 ];
                 $fields[] = $fieldItem;
@@ -65,106 +69,107 @@ class IndexRepository extends BaseRepository
         return $fields;
     }
 
-    public function getAllSubject()
+    public function getAllSubject($params)
     {
-        $subjectIds = $this->eventSubjectModel->order('id desc')->column('subject_id');
-        return $this->subjectModel->whereIn('subject_id', $subjectIds)->column('name');
-    }
+        $page = !empty($params['page']) ? intval($params['page']) : 1;
+        $pageNumber = !empty($params['page_number']) ? intval($params['page_number']) : 20;
 
-    public function getEventList($params)
-    {
-        $events = [];
-        $eventNumber = intval($params['event_number']);
-        if ($eventNumber > 500) {
-            $eventNumber = 500;
-        }
-
-        $query = $this->eventModel->order('timestamp desc');
-
-        //时间筛选
-        if (isset($params['start_time']) && !empty($params['start_time'])) {
-            $query = $query->where('max_year', '>=', $params['start_time']);
-        }
-        if (isset($params['end_time']) && !empty($params['end_time'])) {
-            $query = $query->where('min_year', '<=', $params['end_time']);
-        }
+        $query = $this->eventSubjectModel->order('id desc');
 
         //学科筛选
         if (isset($params['field']) && !empty($params['field'])) {
             $fieldEventIds = $this->eventFieldModel
-                ->whereLike('full_name', "%{$params['field']}%")
+                ->whereLike('level_1_name', $params['field'])
                 ->column('event_id');
             if (!empty($fieldEventIds)) {
                 $query = $query->whereIn('event_id', $fieldEventIds);
             }
         }
 
-        //人物筛选
-        if (isset($params['people']) && !empty($params['people'])) {
-            $subjectIds = $this->subjectModel
-                ->whereLike('name', "%{$params['people']}%")
-                ->column('subject_id');
-            $subjectEventIds = $this->eventSubjectModel
-                ->whereIn('subject_id', $subjectIds)
-                ->column('event_id');
-            if (!empty($subjectEventIds)) {
-                $query = $query->whereIn('event_id', $subjectEventIds);
-            }
+        $subjectIds = $query->column('subject_id');
+        return $this->subjectModel->whereIn('subject_id', $subjectIds)
+            ->order('name', 'asc')
+            ->limit(($page - 1) * $pageNumber, $pageNumber)
+            ->column('name');
+    }
+
+    public function getEventList($params)
+    {
+        $eventMaxNumber = !empty($params['max_number']) ? intval($params['max_number']) : 200;
+        if ($eventMaxNumber > 500) {
+            $eventMaxNumber = 500;
         }
 
-        //关键词筛选
-        if (isset($params['keyword']) && !empty($params['keyword'])) {
-            //事件名称
-            $query = $query->whereLike('name', "%{$params['keyword']}%");
+        $events = [];
+        $minTime = $maxTime = [
+            'year' => '',
+            'sort' => 0,
+        ];
 
-            //演进关系
-            $themeEventIds = $this->eventEvolveThemeModel
-                ->whereLike('theme', "%{$params['keyword']}%")
-                ->column('event_id');
-            if (!empty($subjectEventIds)) {
-                $query = $query->whereOr('event_id', 'in', $themeEventIds);
-            }
-        }
+//        $eventIds = $this->_queryAllEventV2($eventMaxNumber, $params);
+//        if (!empty($eventIds)) {
+//            foreach ($eventIds as $eventId) {
+//                //加入本体事件
+//                list($events, $minTime, $maxTime) = $this->_handlerEvent($events, $minTime, $maxTime, $eventId);
+//
+//                //查询下级事件信息
+//                list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $events, $minTime, $maxTime, $eventId);
+//
+//                //查询上级事件信息
+//                list($events, $minTime, $maxTime) = $this->_getParentEvent($eventMaxNumber, $events, $minTime, $maxTime, $eventId);
+//
+//                if (count($events) >= $eventMaxNumber) {
+//                    break;
+//                }
+//            }
+//        }
 
-        $eventIds = $query->column('event_id');
-        $list = $query->select();
-        if (!empty($list)) {
-            foreach ($list as $item) {
-                //获取下一跳的事件ID
-                $nextEventId = $this->_getNextEvent($item['event_id'], $eventIds);
-                //查找是否存在于演进主题中
-                $evolveInfo = $this->eventEvolveThemeModel->where('event_id', $item['event_id'])->find();
-                //获取关联的学科信息
-                $fieldInfo = $this->eventFieldModel->where('event_id', $item['event_id'])->order('id', 'desc')->find();
-                //年份数据
-                $year = $item['min_year'];
-                if (isset($params['start_time']) && !empty($params['start_time']) && $params['start_time'] > $item['min_year']) {
-                    $year = $params['start_time'];
+        $i = 1;
+        while (true) {
+
+            $eventIds = $this->_queryAllEventV1($params);
+            if (!empty($eventIds)) {
+                foreach ($eventIds as $eventId) {
+                    //加入本体事件
+                    list($events, $minTime, $maxTime) = $this->_handlerEvent($events, $minTime, $maxTime, $eventId);
+
+                    //查询下级事件信息
+                    list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $events, $minTime, $maxTime, $eventId);
+
+                    //查询上级事件信息
+                    list($events, $minTime, $maxTime) = $this->_getParentEvent($eventMaxNumber, $events, $minTime, $maxTime, $eventId);
+
+                    if (count($events) >= $eventMaxNumber) {
+                        break;
+                    }
                 }
+            }
 
-                //整理数据
-                $eventItem = [
-                    'event_id' => $item['event_id'],
-                    'year' => $year,
-                    'time' => $item['time'],
-                    'name' => $item['name'],
-                    'object' => $item['object'],
-                    'field' => [
-                        'full_name' => empty($fieldInfo) ? "" : $fieldInfo['full_name'],
-                        'level_0' => empty($fieldInfo) ? "" : $fieldInfo['level_0_name'],
-                        'level_1' => empty($fieldInfo) ? "" : $fieldInfo['level_1_name'],
-                        'level_2' => empty($fieldInfo) ? "" : $fieldInfo['level_2_name'],
-                    ],
-                    'next_event_id' => empty($nextEventId) ? "" : $nextEventId,
-                    'evolve_info' => [
-                        'has' => empty($evolveInfo) ? false : true,
-                        'theme' => empty($evolveInfo) ? "" : $evolveInfo['theme'],
-                    ],
-                ];
-                $events[] = $eventItem;
+            if (count($events) >= $eventMaxNumber) {
+                break;
+            }
+
+            $params['time'] = $i % 2 == 0 ? ($params['time'] - $i) : ($params['time'] + $i);
+            $i++;
+        }
+
+        //整理列表
+        $lists = [
+            'events' => [],
+            'startYear' => $minTime['year'],
+            'endYear' => $maxTime['year'],
+            'count' => count($events),
+        ];
+        if (!empty($events)) {
+            foreach ($events as $item) {
+                if (empty($lists['events'][$item['field']]['field'])) {
+                    $lists['events'][$item['field']]['field'] = $item['field'];
+                }
+                $lists['events'][$item['field']]['events'][] = $item;
             }
         }
-        return $events;
+
+        return $lists;
     }
 
     public function getEvolveList($params)
