@@ -10,5 +10,5 @@ use think\Model;
  */
 class LiteratureTextualContent extends Model
 {
-    //
+    protected $table = 'literature_textual_content';
 }

@@ -10,5 +10,5 @@ use think\Model;
  */
 class Literature extends Model
 {
-    //
+    protected $table = 'literature';
 }

@@ -27,7 +27,7 @@ class Index extends BaseController
      */
     public function times(Request $request)
     {
-        $times = $this->repository->getAllTime($request::param());
+        $times = $this->repository->getAllTime();
         return success('时间轴', $times);
     }
 

@@ -10,5 +10,5 @@ use think\Model;
  */
 class EventTag extends Model
 {
-    //
+    protected $table = 'event__tag';
 }

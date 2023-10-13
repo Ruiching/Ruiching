@@ -10,5 +10,5 @@ use think\Model;
  */
 class Subject extends Model
 {
-    //
+    protected $table = 'subject';
 }

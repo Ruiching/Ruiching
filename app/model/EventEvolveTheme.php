@@ -10,5 +10,5 @@ use think\Model;
  */
 class EventEvolveTheme extends Model
 {
-    //
+    protected $table = 'event__evolve_theme';
 }

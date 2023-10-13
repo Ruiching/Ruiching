@@ -10,5 +10,5 @@ use think\Model;
  */
 class FormatedLocation extends Model
 {
-    //
+    protected $table = 'formated_location';
 }

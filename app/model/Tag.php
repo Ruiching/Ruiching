@@ -10,5 +10,5 @@ use think\Model;
  */
 class Tag extends Model
 {
-    //
+    protected $table = 'tag';
 }

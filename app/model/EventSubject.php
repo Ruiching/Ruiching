@@ -10,5 +10,5 @@ use think\Model;
  */
 class EventSubject extends Model
 {
-    //
+    protected $table = 'event__subject';
 }

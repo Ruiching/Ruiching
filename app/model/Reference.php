@@ -10,5 +10,5 @@ use think\Model;
  */
 class Reference extends Model
 {
-    //
+    protected $table = 'reference';
 }

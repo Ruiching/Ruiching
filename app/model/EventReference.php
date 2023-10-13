@@ -10,5 +10,5 @@ use think\Model;
  */
 class EventReference extends Model
 {
-    //
+    protected $table = 'event__reference';
 }

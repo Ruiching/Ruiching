@@ -10,5 +10,5 @@ use think\Model;
  */
 class EventQuality extends Model
 {
-    //
+    protected $table = 'event_quality';
 }

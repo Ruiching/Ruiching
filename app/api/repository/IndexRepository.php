@@ -12,26 +12,23 @@ class IndexRepository extends BaseRepository
 {
     use CommonTrait;
 
-    public function getAllTime($params)
+    public function getAllTime()
     {
-        $query = $this->eventModel->group('min_year')->order('min_year', 'desc');
-        if (isset($params['start_time']) && !empty($params['start_time'])) {
-            $query = $query->where('max_year', '>=', $params['start_time']);
-        }
-        if (isset($params['end_time']) && !empty($params['end_time'])) {
-            $query = $query->where('min_year', '<=', $params['end_time']);
-        }
-        $times = [];
-        $lists = $query->field('min_year')->select();
-        if (!empty($lists)) {
-            foreach ($lists as $item) {
-                $times[] = [
-                    'time' => $item['min_year'] . '年',
-                    'year' => $item['min_year'],
-                ];
-            }
-        }
-        return $times;
+        $startTime = $this->eventModel
+            ->order('timestamp', 'asc')
+            ->value('time');
+
+        $endTime = $this->eventModel
+            ->order('timestamp', 'desc')
+            ->value('time');
+
+        $startYear = $this->_handlerEventTimeToYear($startTime);
+        $endYear = $this->_handlerEventTimeToYear($endTime);
+
+        return [
+            'startYear' => $startYear,
+            'endYear' => $endYear,
+        ];
     }
 
     public function getAllFields($params)

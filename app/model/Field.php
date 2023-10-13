@@ -10,5 +10,5 @@ use think\Model;
  */
 class Field extends Model
 {
-    //
+    protected $table = 'field';
 }
