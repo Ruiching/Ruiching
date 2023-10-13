@@ -38,7 +38,7 @@ class Index extends BaseController
      */
     public function fields(Request $request)
     {
-        $fields = $this->repository->getAllFields($request::param());
+        $fields = $this->repository->getAllFields();
         return success('学科列表', $fields);
     }
 
@@ -49,7 +49,7 @@ class Index extends BaseController
      */
     public function subject(Request $request)
     {
-        $fields = $this->repository->getAllSubject($request::param());
+        $fields = $this->repository->getAllSubject();
         return success('人物列表', $fields);
     }
 

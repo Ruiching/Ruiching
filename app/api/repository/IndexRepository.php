@@ -31,81 +31,54 @@ class IndexRepository extends BaseRepository
         ];
     }
 
-    public function getAllFields($params)
+    public function getAllFields()
     {
-        $query = $this->eventFieldModel;
+        $fields = [];
 
-        //学科字段
-        $field = 'level_0_name';
-        if (isset($params['level']) && $params['level'] == 2) {
-            $field = 'level_1_name';
-        }
-        if (isset($params['level']) && $params['level'] == 3) {
-            $field = 'level_2_name';
-        }
+        //0级学科
+        $oneList = $this->eventFieldModel->group('level_0_name')->column('level_0_name');
+        if (!empty($oneList)) {
+            foreach ($oneList as $oneLevel) {
+                $childrenList = [];
 
-        //上级学科筛选
-        if (isset($params['level_1']) && !empty($params['level_1'])) {
-            $query = $query->where('level_0_name', $params['level_1']);
-        }
-        if (isset($params['level_2']) && !empty($params['level_2'])) {
-            $query = $query->where('level_1_name', $params['level_2']);
-        }
+                //1级学科
+                $childrenField = $this->eventFieldModel
+                    ->where('level_0_name', $oneLevel)
+                    ->group('level_1_name')
+                    ->column('level_1_name');
+                if (!empty($childrenField)) {
+                    foreach ($childrenField as $value) {
+                        $childrenList = [
+                            'field' => $value,
+                        ];
+                    }
+                }
 
-        //时间筛选
-        if ( (isset($params['start_time']) && !empty($params['start_time'])) || (isset($params['end_time']) && !empty($params['end_time'])) ) {
-            $eventQuery = $this->eventModel;
-            if (isset($params['start_time']) && !empty($params['start_time'])) {
-                $eventQuery = $eventQuery->where('max_year', '>=', $params['start_time']);
-            }
-            if (isset($params['end_time']) && !empty($params['end_time'])) {
-                $eventQuery = $eventQuery->where('min_year', '<=', $params['end_time']);
-            }
-            $eventIds = $eventQuery->column('event_id');
-            if (!empty($eventIds)) {
-                $query = $query->whereIn('event_id', $eventIds);
+                $fieldItem = [
+                    'field' => $oneList,
+                    'children' => $childrenList
+                ];
+                $fields[] = $fieldItem;
             }
         }
 
-        return $query->group($field)->column($field);
+        return $fields;
     }
 
-    public function getAllSubject($params)
+    public function getAllSubject()
     {
-        $query = $this->eventSubjectModel->order('id desc');
-
-        //根据时间筛选
-        if ( (isset($params['start_time']) && !empty($params['start_time'])) || (isset($params['end_time']) && !empty($params['end_time'])) ) {
-            $eventQuery = $this->eventModel;
-            if (isset($params['start_time']) && !empty($params['start_time'])) {
-                $eventQuery = $eventQuery->where('max_year', '>=', $params['start_time']);
-            }
-            if (isset($params['end_time']) && !empty($params['end_time'])) {
-                $eventQuery = $eventQuery->where('min_year', '<=', $params['end_time']);
-            }
-            $eventIds = $eventQuery->column('event_id');
-            if (!empty($eventIds)) {
-                $query = $query->whereIn('event_id', $eventIds);
-            }
-        }
-
-        //学科
-        if (isset($params['field']) && !empty($params['field'])) {
-            $fieldEventIds = $this->eventFieldModel
-                ->whereLike('full_name', "%{$params['field']}%")
-                ->column('event_id');
-            if (!empty($fieldEventIds)) {
-                $query = $query->whereIn('event_id', $fieldEventIds);
-            }
-        }
-
-        $subjectIds = $query->column('subject_id');
+        $subjectIds = $this->eventSubjectModel->order('id desc')->column('subject_id');
         return $this->subjectModel->whereIn('subject_id', $subjectIds)->column('name');
     }
 
     public function getEventList($params)
     {
         $events = [];
+        $eventNumber = intval($params['event_number']);
+        if ($eventNumber > 500) {
+            $eventNumber = 500;
+        }
+
         $query = $this->eventModel->order('timestamp desc');
 
         //时间筛选
