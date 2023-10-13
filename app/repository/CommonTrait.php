@@ -145,17 +145,11 @@ trait CommonTrait
         }
 
         //查询到的所有事件
-        $timestamp = $query->order('timestamp', 'asc')->value('timestamp');
-
-        $upEventIds = $this->eventModel
-            ->where('timestamp', '>=', $timestamp)
-            ->order('timestamp', 'asc')
+        $upEventIds = $query->order('timestamp', 'asc')
             ->limit(0, floor($maxNumber / 2))
             ->column('event_id');
 
-        $downEventIds = $this->eventModel
-            ->where('timestamp', '<', $timestamp)
-            ->order('timestamp', 'desc')
+        $downEventIds = $query->order('timestamp', 'desc')
             ->limit(0, floor($maxNumber / 2))
             ->column('event_id');
 
