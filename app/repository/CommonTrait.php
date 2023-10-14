@@ -23,10 +23,10 @@ trait CommonTrait
         if (strpos($year, '世纪') !== false) {
             if (strpos($year, '世纪中叶') !== false) {
                 $timeArr = explode('世纪', $year);
-                $year = ($timeArr[0] - 1) * 100 + 40;
+                $year = empty($timeArr[0]) ? 40 : ($timeArr[0] - 1) * 100 + 40;
             } else {
                 $timeArr = explode('世纪', $year);
-                $first = ($timeArr[0] - 1) * 100;
+                $first = empty($timeArr[0]) ? 0 : ($timeArr[0] - 1) * 100;
                 $second = empty($timeArr[1]) ? 0 : $timeArr[1];
                 $year = $first + $second;
             }
