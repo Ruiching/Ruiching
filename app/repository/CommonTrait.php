@@ -12,6 +12,10 @@ trait CommonTrait
         $timeArr = explode('年', $time);
         $year = $timeArr[0];
 
+        if (strpos($year, '~') !== false) {
+            $timeArr = explode('~', $year);
+            $year = $timeArr[0];
+        }
         if (strpos($year, '～') !== false) {
             $timeArr = explode('～', $year);
             $year = $timeArr[0];
