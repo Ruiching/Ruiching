@@ -20,6 +20,14 @@ trait CommonTrait
             $timeArr = explode('-',$year);
             $year = $timeArr[0];
         }
+        if (strpos($year, '公元') !== false && strpos($year, '公元前') === false) {
+            $timeArr = explode('公元', $year);
+            $year = $timeArr[1];
+        }
+        if (strpos($year, '公元前') !== false) {
+            $timeArr = explode('公元前', $timeArr[0]);
+            $year = '-' . $timeArr[1];
+        }
         if (strpos($year, '世纪') !== false) {
             if (strpos($year, '世纪中叶') !== false) {
                 $timeArr = explode('世纪', $year);
@@ -30,14 +38,6 @@ trait CommonTrait
                 $second = empty($timeArr[1]) ? 0 : $timeArr[1];
                 $year = $first + $second;
             }
-        }
-        if (strpos($year, '公元') !== false && strpos($year, '公元前') === false) {
-            $timeArr = explode('公元', $year);
-            $year = $timeArr[1];
-        }
-        if (strpos($year, '公元前') !== false) {
-            $timeArr = explode('公元前', $timeArr[0]);
-            $year = '-' . $timeArr[1];
         }
         return $year;
     }
