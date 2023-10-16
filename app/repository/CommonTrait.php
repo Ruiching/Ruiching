@@ -177,13 +177,13 @@ trait CommonTrait
                 'sort' => $eventInfo['timestamp'],
             ];
         }
-        if ($minTime['sort'] > $eventInfo['timestamp']) {
+        if ($minTime['sort'] > $eventInfo['timestamp'] && !empty($eventInfo['formated_time'])) {
             $minTime = [
                 'year' => $eventInfo['formated_time'],
                 'sort' => $eventInfo['timestamp'],
             ];
         }
-        if ($maxTime['sort'] < $eventInfo['timestamp']) {
+        if ($maxTime['sort'] < $eventInfo['timestamp'] && !empty($eventInfo['formated_time'])) {
             $maxTime = [
                 'year' => $eventInfo['formated_time'],
                 'sort' => $eventInfo['timestamp'],
