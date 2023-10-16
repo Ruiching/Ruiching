@@ -53,10 +53,9 @@ trait CommonTrait
             ->where('formated_time', '<', '2060年');
 
         //时间筛选
-        if (empty($params['time'])) {
-            $params['time'] = date('Y', time());
+        if (isset($params['time']) && !empty($params['time'])) {
+            $query->whereLike('formated_time', "%{$params['time']}年%");
         }
-        $query = $query->whereLike('formated_time', "%{$params['time']}年%");
 
         //学科筛选
         if (isset($params['field']) && !empty($params['field'])) {
