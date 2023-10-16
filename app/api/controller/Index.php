@@ -93,4 +93,19 @@ class Index extends BaseController
         }
     }
 
+    /**
+     * 搜索推荐事件
+     * @param Request $request
+     * @return array
+     */
+    public function recommend(Request $request)
+    {
+        if (Request::isPost()){
+            $lists = $this->repository->getRecommendList($request::param());
+            return success('事件列表', $lists);
+        }else{
+            return error('非法请求');
+        }
+    }
+
 }

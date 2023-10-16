@@ -176,7 +176,7 @@ class IndexRepository extends BaseRepository
     {
         $events = [];
         $eventIds = $this->eventEvolveThemeModel->where('theme', $params['theme'])->column('event_id');
-        $list = $this->eventModel->whereIn('event_id', $eventIds)->order('timestamp desc')->select();
+        $list = $this->eventModel->whereIn('event_id', $eventIds)->order('timestamp', 'desc')->select();
         if (!empty($list)) {
             foreach ($list as $item) {
                 //获取下一跳的事件ID
@@ -189,6 +189,44 @@ class IndexRepository extends BaseRepository
                     'next_event_id' => empty($nextEventId) ? "" : $nextEventId,
                 ];
                 $events[] = $eventItem;
+            }
+        }
+        return $events;
+    }
+
+    public function getRecommendList($params)
+    {
+        $limitNumber = !empty($params['limit_num']) ? intval($params['limit_num']) : 10;
+        if ($limitNumber > 100) {
+            $limitNumber = 100;
+        }
+
+        $query = $this->eventModel
+            ->where('timestamp', '>', 0)
+            ->where('formated_time', '<', '2060年');
+
+        //时间筛选
+        if (empty($params['time'])) {
+            $params['time'] = date('Y', time());
+        }
+        $query = $query->whereLike('formated_time', "%{$params['time']}年%");
+
+        //学科筛选
+        if (isset($params['field']) && !empty($params['field'])) {
+            $fieldEventIds = $this->eventFieldModel
+                ->whereLike('level_1_name', $params['field'])
+                ->column('event_id');
+            if (!empty($fieldEventIds)) {
+                $query = $query->whereIn('event_id', $fieldEventIds);
+            }
+        }
+
+        //查询到的所有事件
+        $events = [];
+        $lists = $query->order('timestamp', 'desc')->limit($limitNumber)->select();
+        if (!empty($lists)) {
+            foreach ($lists as $item) {
+                $events[] = $this->_handlerEventItem($item);
             }
         }
         return $events;

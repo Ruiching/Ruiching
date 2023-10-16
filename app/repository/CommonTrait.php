@@ -165,27 +165,6 @@ trait CommonTrait
         //查询事件
         $eventInfo = $this->eventModel->where('event_id', $eventId)->find();
 
-        //下一级事件
-        $childEventId = $this->eventRelationModel
-            ->where('target_event_id', $eventId)
-            ->value('source_event_id');
-
-        //上一级事件
-        $parentEventId = $this->eventRelationModel
-            ->where('source_event_id', $eventId)
-            ->value('target_event_id');
-
-        //查找是否存在于演进主题中
-        $evolveTheme = $this->eventEvolveThemeModel
-            ->where('event_id', $eventId)
-            ->value('theme');
-
-        //获取关联的学科信息
-        $field = $this->eventFieldModel
-            ->where('event_id', $eventId)
-            ->order('id', 'desc')
-            ->value('level_1_name');
-
         //年份数据
         if (empty($minTime['sort'])) {
             $minTime = [
@@ -212,8 +191,35 @@ trait CommonTrait
             ];
         }
 
+        $list[] = $this->_handlerEventItem($eventInfo);
+        return [ $list, $minTime, $maxTime ];
+    }
+
+    public function _handlerEventItem($eventInfo)
+    {
+        //下一级事件
+        $childEventId = $this->eventRelationModel
+            ->where('target_event_id', $eventInfo['event_id'])
+            ->value('source_event_id');
+
+        //上一级事件
+        $parentEventId = $this->eventRelationModel
+            ->where('source_event_id', $eventInfo['event_id'])
+            ->value('target_event_id');
+
+        //查找是否存在于演进主题中
+        $evolveTheme = $this->eventEvolveThemeModel
+            ->where('event_id', $eventInfo['event_id'])
+            ->value('theme');
+
+        //获取关联的学科信息
+        $field = $this->eventFieldModel
+            ->where('event_id', $eventInfo['event_id'])
+            ->order('id', 'desc')
+            ->value('level_1_name');
+
         //整理数据
-        $eventItem = [
+        return [
             'event_id' => $eventInfo['event_id'],
             'year' => $this->_handlerEventTimeToYear($eventInfo['formated_time']),
             'time' => $eventInfo['time'],
@@ -229,9 +235,6 @@ trait CommonTrait
                 'theme' => empty($evolveTheme) ? "" : $evolveTheme,
             ],
         ];
-
-        $list[] = $eventItem;
-        return [ $list, $minTime, $maxTime ];
     }
 
     public function _getChildrenEvent($maxNumber, $list, $minTime, $maxTime, $eventId)
