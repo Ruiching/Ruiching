@@ -295,7 +295,7 @@ class IndexRepository extends BaseRepository
     public function getEventMap($params)
     {
         $map = [];
-        $fields = $this->eventFieldModel->group('level_1_field')->column('level_1_field');
+        $fields = $this->eventFieldModel->group('level_1_name')->column('level_1_name');
         foreach ($fields as $field) {
             $map[$field] = [];
             $eventIds = $this->eventFieldModel->where('level_1_name', $field)->column('event_id');
