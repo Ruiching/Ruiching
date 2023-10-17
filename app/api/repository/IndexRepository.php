@@ -292,6 +292,32 @@ class IndexRepository extends BaseRepository
         ];
     }
 
+    public function getEventMap($params)
+    {
+        $map = [];
+        $fields = $this->eventFieldModel->group('level_1_field')->column('level_1_field');
+        foreach ($fields as $field) {
+            $map[$field] = [];
+            $eventIds = $this->eventFieldModel->where('level_1_name', $field)->column('event_id');
+            if (!empty($eventIds)) {
+                // 根据时间进行分组
+                $mixTime = -4000;
+                $maxTime = 2060;
+                for ($i = $mixTime; $i <= $maxTime; $i = $i = 100) {
+                    $startYear = $i . "年";
+                    $endYear = ($i + 100) . "年";
+                    $eventCount = $this->eventModel
+                        ->whereIn('event_id', $eventIds)
+                        ->where('formated_time', '>=', $startYear)
+                        ->where('formated_time', '<', $endYear)
+                        ->count();
+                    $map[$field][$startYear] = empty($eventCount) ? 0 : intval($eventCount);
+                }
+            }
+        }
+        return $map;
+    }
+
     public function getEvolveList($params)
     {
         $events = [];

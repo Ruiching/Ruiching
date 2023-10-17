@@ -84,6 +84,17 @@ class Index extends BaseController
     }
 
     /**
+     * 获取事件分布
+     * @param Request $request
+     * @return array
+     */
+    public function eventMap(Request $request)
+    {
+        $map = $this->repository->getEventMap($request::param());
+        return success('事件分布', $map);
+    }
+
+    /**
      * 获取演进关系
      * @param Request $request
      * @return array
