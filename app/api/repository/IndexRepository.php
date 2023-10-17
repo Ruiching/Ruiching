@@ -100,6 +100,8 @@ class IndexRepository extends BaseRepository
             $eventMaxNumber = 500;
         }
 
+        $eventTimeRange = !empty($params['time_range']) ? intval($params['time_range']) : 0;
+
         $events = [];
         $minTime = $maxTime = [
             'year' => '',
@@ -124,6 +126,17 @@ class IndexRepository extends BaseRepository
 //            }
 //        }
 
+        $timeRange = [
+            'start' => '',
+            'end' => '',
+        ];
+        if (isset($params['time']) && !empty($params['time'])) {
+            $timeRange = [
+                'start' => $params['time'] - $eventTimeRange,
+                'end' => $params['time'] + $eventTimeRange,
+            ];
+        }
+
         $i = 1;
         while (true) {
 
@@ -131,13 +144,16 @@ class IndexRepository extends BaseRepository
             if (!empty($eventIds)) {
                 foreach ($eventIds as $eventId) {
                     //加入本体事件
-                    list($events, $minTime, $maxTime) = $this->_handlerEvent($events, $minTime, $maxTime, $eventId);
+                    list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId);
+                    if (!empty($eventItem)) {
+                        $events[] = $eventItem;
+                    }
 
                     //查询下级事件信息
-                    list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $events, $minTime, $maxTime, $eventId);
+                    list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
 
                     //查询上级事件信息
-                    list($events, $minTime, $maxTime) = $this->_getParentEvent($eventMaxNumber, $events, $minTime, $maxTime, $eventId);
+                    list($events, $minTime, $maxTime) = $this->_getParentEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
 
                     if (count($events) >= $eventMaxNumber) {
                         break;

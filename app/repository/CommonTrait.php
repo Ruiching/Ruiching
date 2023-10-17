@@ -159,7 +159,7 @@ trait CommonTrait
         return array_merge($upEventIds, $downEventIds);
     }
 
-    public function _handlerEvent($list, $minTime, $maxTime, $eventId)
+    public function _handlerEvent($minTime, $maxTime, $eventId)
     {
         //查询事件
         $eventInfo = $this->eventModel->where('event_id', $eventId)->find();
@@ -190,8 +190,8 @@ trait CommonTrait
             ];
         }
 
-        $list[] = $this->_handlerEventItem($eventInfo);
-        return [ $list, $minTime, $maxTime ];
+        $item = $this->_handlerEventItem($eventInfo);
+        return [ $item, $minTime, $maxTime ];
     }
 
     public function _handlerEventItem($eventInfo)
@@ -236,7 +236,7 @@ trait CommonTrait
         ];
     }
 
-    public function _getChildrenEvent($maxNumber, $list, $minTime, $maxTime, $eventId)
+    public function _getChildrenEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $eventId)
     {
         //够数量，直接返回
         if (count($list) >= $maxNumber) {
@@ -254,13 +254,22 @@ trait CommonTrait
         }
 
         //处理事件
-        list($list, $minTime, $maxTime) = $this->_handlerEvent($list, $minTime, $maxTime, $childrenEventId);
+        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $childrenEventId);
+        if (!empty($eventItem)) {
+            if (!empty($timeRange['start']) && !empty($timeRange['end'])) {
+                $year = $this->_handlerEventTimeToYear($eventItem['formated_time']);
+                if ($year < $timeRange['start'] || $year > $timeRange['end']) {
+                    return [ $list, $minTime, $maxTime ];
+                }
+            }
+            $list[] = $eventItem;
+        }
 
         //递归查询
-        return $this->_getChildrenEvent($maxNumber, $list, $minTime, $maxTime, $childrenEventId);
+        return $this->_getChildrenEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $childrenEventId);
     }
 
-    public function _getParentEvent($maxNumber, $list, $minTime, $maxTime, $eventId)
+    public function _getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $eventId)
     {
         //够数量，直接返回
         if (count($list) >= $maxNumber) {
@@ -278,10 +287,19 @@ trait CommonTrait
         }
 
         //处理事件
-        list($list, $minTime, $maxTime) = $this->_handlerEvent($list, $minTime, $maxTime, $parentEventId);
+        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $parentEventId);
+        if (!empty($eventItem)) {
+            if (!empty($timeRange['start']) && !empty($timeRange['end'])) {
+                $year = $this->_handlerEventTimeToYear($eventItem['formated_time']);
+                if ($year < $timeRange['start'] || $year > $timeRange['end']) {
+                    return [ $list, $minTime, $maxTime ];
+                }
+            }
+            $list[] = $eventItem;
+        }
 
         //递归查询
-        return $this->_getParentEvent($maxNumber, $list, $minTime, $maxTime, $parentEventId);
+        return $this->_getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $parentEventId);
     }
 
     public function _getNextEvent($eventId, $checkEventIds)
