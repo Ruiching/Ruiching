@@ -6,6 +6,7 @@ namespace app\api\repository;
 use app\repository\BaseRepository;
 use app\repository\CommonTrait;
 use app\Request;
+use think\facade\Cache;
 use think\facade\Env;
 
 class IndexRepository extends BaseRepository
@@ -294,26 +295,31 @@ class IndexRepository extends BaseRepository
 
     public function getEventMap($params)
     {
-        $map = [];
-        $fields = $this->eventFieldModel->group('level_1_name')->column('level_1_name');
-        foreach ($fields as $field) {
-            $map[$field] = [];
-            $eventIds = $this->eventFieldModel->where('level_1_name', $field)->column('event_id');
-            if (!empty($eventIds)) {
-                // 根据时间进行分组
-                $mixTime = -4000;
-                $maxTime = 2060;
-                for ($i = $mixTime; $i <= $maxTime; $i = $i = 100) {
-                    $startYear = $i . "年";
-                    $endYear = ($i + 100) . "年";
-                    $eventCount = $this->eventModel
-                        ->whereIn('event_id', $eventIds)
-                        ->where('formated_time', '>=', $startYear)
-                        ->where('formated_time', '<', $endYear)
-                        ->count();
-                    $map[$field][$startYear] = empty($eventCount) ? 0 : intval($eventCount);
+        if (isset($params['op']) && $params['op'] == 'refresh') {
+            $map = [];
+            $fields = $this->eventFieldModel->group('level_1_name')->column('level_1_name');
+            foreach ($fields as $field) {
+                $map[$field] = [];
+                $eventIds = $this->eventFieldModel->where('level_1_name', $field)->column('event_id');
+                if (!empty($eventIds)) {
+                    // 根据时间进行分组
+                    $mixTime = -3000;
+                    $maxTime = 2060;
+                    for ($i = $mixTime; $i <= $maxTime; $i += 100) {
+                        $startYear = $i . "年";
+                        $endYear = ($i + 100) . "年";
+                        $eventCount = $this->eventModel
+                            ->whereIn('event_id', $eventIds)
+                            ->where('formated_time', '>=', $startYear)
+                            ->where('formated_time', '<', $endYear)
+                            ->count();
+                        $map[$field][$startYear] = empty($eventCount) ? 0 : intval($eventCount);
+                    }
                 }
             }
+            Cache::set('event_map', $map, 86400 * 30);
+        } else {
+            $map = Cache::get('event_map');
         }
         return $map;
     }
