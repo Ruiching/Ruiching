@@ -144,20 +144,18 @@ class IndexRepository extends BaseRepository
             if (!empty($eventIds)) {
                 foreach ($eventIds as $eventId) {
                     //加入本体事件
-                    list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId, $timeRange);
-                    if (empty($eventItem)) {
-                        break;
-                    }
-                    $events[] = $eventItem;
+                    list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId, []);
+                    if (!empty($eventItem)) {
+                        $events[] = $eventItem;
+                        //查询下级事件信息
+                        list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
 
-                    //查询下级事件信息
-                    list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
+                        //查询上级事件信息
+                        list($events, $minTime, $maxTime) = $this->_getParentEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
 
-                    //查询上级事件信息
-                    list($events, $minTime, $maxTime) = $this->_getParentEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
-
-                    if (count($events) >= $eventMaxNumber) {
-                        break;
+                        if (count($events) >= $eventMaxNumber) {
+                            break;
+                        }
                     }
                 }
             }
