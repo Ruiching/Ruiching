@@ -205,13 +205,19 @@ class IndexRepository extends BaseRepository
             'sort' => 0,
         ];
 
+        $timeRange = !empty($params['time_range']) ? intval($params['time_range']) : 0;
         $maxLevel = !empty($params['max_level']) ? intval($params['max_level']) : 10;
         if ($maxLevel > 10) {
             $maxLevel = 10;
         }
 
         $eventIds = [];
-        $topIds = $this->_queryAllEventV3($params);
+        $topIds = [];
+        for ($j = 0; $j < $timeRange; $j++) {
+            $topEvents = $this->_queryAllEventV3($params);
+            $topIds = array_merge($topIds, $topEvents);
+            $params['time'] = $j % 2 == 0 ? ($params['time'] - $j) : ($params['time'] + $j);
+        }
         if (!empty($topIds)) {
             $queryChildrenIds = $queryParentIds = $topIds;
             //查询下级事件信息
