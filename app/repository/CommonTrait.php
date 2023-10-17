@@ -159,6 +159,59 @@ trait CommonTrait
         return array_merge($upEventIds, $downEventIds);
     }
 
+    public function _queryAllEventV3($params)
+    {
+        $query = $this->eventModel
+            ->where('timestamp', '>', 0)
+            ->where('formated_time', '<', '2060年');
+
+        //时间筛选
+        if (empty($params['time'])) {
+            $params['time'] = date('Y', time());
+        }
+        $query = $query->whereLike('formated_time', "%{$params['time']}年%");
+
+        //学科筛选
+        if (isset($params['field']) && !empty($params['field'])) {
+            $fieldEventIds = $this->eventFieldModel
+                ->whereLike('level_1_name', $params['field'])
+                ->column('event_id');
+            if (!empty($fieldEventIds)) {
+                $query = $query->whereIn('event_id', $fieldEventIds);
+            }
+        }
+
+        //人物筛选
+        if (isset($params['people']) && !empty($params['people'])) {
+            $subjectIds = $this->subjectModel
+                ->whereLike('name', "%{$params['people']}%")
+                ->column('subject_id');
+            $subjectEventIds = $this->eventSubjectModel
+                ->whereIn('subject_id', $subjectIds)
+                ->column('event_id');
+            if (!empty($subjectEventIds)) {
+                $query = $query->whereIn('event_id', $subjectEventIds);
+            }
+        }
+
+        //关键词筛选
+        if (isset($params['keyword']) && !empty($params['keyword'])) {
+            //事件名称
+            $query = $query->whereLike('name|object', "%{$params['keyword']}%");
+
+            //演进关系
+            $themeEventIds = $this->eventEvolveThemeModel
+                ->whereLike('theme', "%{$params['keyword']}%")
+                ->column('event_id');
+            if (!empty($subjectEventIds)) {
+                $query = $query->whereOr('event_id', 'in', $themeEventIds);
+            }
+        }
+
+        //查询到的所有事件
+        return $query->order('timestamp', 'asc')->column('event_id');
+    }
+
     public function _handlerEvent($minTime, $maxTime, $eventId, $timeRange = [])
     {
         //查询事件
@@ -277,6 +330,20 @@ trait CommonTrait
         return $this->_getChildrenEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $childrenEventId);
     }
 
+    public function _getChildrenEventV1($parentEventIds)
+    {
+        //查找事件
+        $childrenEventId = $this->eventRelationModel
+            ->whereIn('target_event_id', $parentEventIds)
+            ->column('source_event_id');
+
+        //没有事件，直接返回
+        if (empty($childrenEventId)) {
+            return [];
+        }
+        return $childrenEventId;
+    }
+
     public function _getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $eventId)
     {
         //够数量，直接返回
@@ -302,6 +369,20 @@ trait CommonTrait
 
         //递归查询
         return $this->_getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $parentEventId);
+    }
+
+    public function _getParentEventV1($childrenEventIds)
+    {
+        //查找事件
+        $parentEventId = $this->eventRelationModel
+            ->whereIn('source_event_id', $childrenEventIds)
+            ->column('target_event_id');
+
+        //没有事件，直接返回
+        if (empty($parentEventId)) {
+            return [];
+        }
+        return $parentEventId;
     }
 
     public function _getNextEvent($eventId, $checkEventIds)

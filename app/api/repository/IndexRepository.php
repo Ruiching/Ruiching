@@ -197,6 +197,95 @@ class IndexRepository extends BaseRepository
         return $lists;
     }
 
+    public function getEventListV2($params)
+    {
+        $events = [];
+        $minTime = $maxTime = [
+            'year' => '',
+            'sort' => 0,
+        ];
+
+        $maxLevel = !empty($params['max_level']) ? intval($params['max_level']) : 10;
+        if ($maxLevel > 10) {
+            $maxLevel = 10;
+        }
+
+        $eventIds = [];
+        $topIds = $this->_queryAllEventV3($params);
+        if (!empty($topIds)) {
+            $queryChildrenIds = $queryParentIds = $topIds;
+            //查询下级事件信息
+            for ($i = 1; $i <= $maxLevel; $i++) {
+                $childrenIds = $this->_getChildrenEventV1($queryChildrenIds);
+                if (empty($childrenIds)) {
+                    break;
+                }
+                $eventIds = array_merge($eventIds, $childrenIds);
+                $queryChildrenIds = $childrenIds;
+            }
+            //查询上级事件信息
+            for ($i = 1; $i <= $maxLevel; $i++) {
+                $parentIds = $this->_getParentEventV1($queryParentIds);
+                if (empty($parentIds)) {
+                    break;
+                }
+                $eventIds = array_merge($eventIds, $parentIds);
+                $queryParentIds = $parentIds;
+            }
+            $eventIds = array_merge($eventIds, $topIds);
+            //去重
+            $eventIds = array_unique($eventIds);
+        }
+
+        if (!empty($eventIds)) {
+            $lists = $this->eventModel->where('event_id', 'in', $eventIds)->select();
+            foreach ($lists as $item) {
+                $item = $this->_handlerEventItem($item);
+
+                //年份数据
+                if (empty($minTime['sort'])) {
+                    $minTime = [
+                        'year' => $item['formated_time'],
+                        'sort' => $item['timestamp'],
+                    ];
+                }
+                if (empty($maxTime['sort'])) {
+                    $maxTime = [
+                        'year' => $item['formated_time'],
+                        'sort' => $item['timestamp'],
+                    ];
+                }
+                if ($minTime['sort'] > $item['timestamp'] && !empty($item['formated_time'])) {
+                    $minTime = [
+                        'year' => $item['formated_time'],
+                        'sort' => $item['timestamp'],
+                    ];
+                }
+                if ($maxTime['sort'] < $item['timestamp'] && !empty($item['formated_time'])) {
+                    $maxTime = [
+                        'year' => $item['formated_time'],
+                        'sort' => $item['timestamp'],
+                    ];
+                }
+
+                if (empty($events[$item['field']]['field'])) {
+                    $events[$item['field']]['field'] = $item['field'];
+                }
+                $events[$item['field']]['events'][] = $item;
+            }
+        }
+
+        //整理列表
+        return [
+            'events' => [],
+            'start_time' => $minTime['year'],
+            'end_time' => $maxTime['year'],
+            'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
+            'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
+            'count' => count($events),
+        ];
+    }
+
     public function getEvolveList($params)
     {
         $events = [];

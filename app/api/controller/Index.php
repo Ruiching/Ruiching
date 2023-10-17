@@ -69,6 +69,21 @@ class Index extends BaseController
     }
 
     /**
+     * 获取事件
+     * @param Request $request
+     * @return array
+     */
+    public function eventsV2(Request $request)
+    {
+        if (Request::isPost()){
+            $lists = $this->repository->getEventListV2($request::param());
+            return success('事件列表', $lists);
+        }else{
+            return error('非法请求');
+        }
+    }
+
+    /**
      * 获取演进关系
      * @param Request $request
      * @return array
