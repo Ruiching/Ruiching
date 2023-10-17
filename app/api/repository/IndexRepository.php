@@ -130,7 +130,7 @@ class IndexRepository extends BaseRepository
             'start' => '',
             'end' => '',
         ];
-        if (isset($params['time']) && !empty($params['time'])) {
+        if (isset($params['time']) && !empty($params['time']) && $eventTimeRange > 0) {
             $timeRange = [
                 'start' => $params['time'] - $eventTimeRange,
                 'end' => $params['time'] + $eventTimeRange,
@@ -147,6 +147,7 @@ class IndexRepository extends BaseRepository
                     list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId, []);
                     if (!empty($eventItem)) {
                         $events[] = $eventItem;
+
                         //查询下级事件信息
                         list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
 
@@ -166,6 +167,7 @@ class IndexRepository extends BaseRepository
                     break;
                 }
             }
+
             if (count($events) >= $eventMaxNumber) {
                 break;
             }
