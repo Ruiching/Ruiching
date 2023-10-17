@@ -159,10 +159,18 @@ trait CommonTrait
         return array_merge($upEventIds, $downEventIds);
     }
 
-    public function _handlerEvent($minTime, $maxTime, $eventId)
+    public function _handlerEvent($minTime, $maxTime, $eventId, $timeRange = [])
     {
         //查询事件
         $eventInfo = $this->eventModel->where('event_id', $eventId)->find();
+        $item = $this->_handlerEventItem($eventInfo);
+
+        //时间范围筛选
+        if (!empty($timeRange) && !empty($timeRange['start']) && !empty($timeRange['end'])) {
+            if ($item['year'] < $timeRange['start'] || $item['year'] > $timeRange['end']) {
+                return [ [], $minTime, $maxTime ];
+            }
+        }
 
         //年份数据
         if (empty($minTime['sort'])) {
@@ -190,7 +198,6 @@ trait CommonTrait
             ];
         }
 
-        $item = $this->_handlerEventItem($eventInfo);
         return [ $item, $minTime, $maxTime ];
     }
 
@@ -261,13 +268,8 @@ trait CommonTrait
         }
 
         //处理事件
-        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $childrenEventId);
+        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $childrenEventId, $timeRange);
         if (!empty($eventItem)) {
-            if (!empty($timeRange['start']) && !empty($timeRange['end'])) {
-                if ($eventItem['year'] < $timeRange['start'] || $eventItem['year'] > $timeRange['end']) {
-                    return [ $list, $minTime, $maxTime ];
-                }
-            }
             $list[] = $eventItem;
         }
 
@@ -293,13 +295,8 @@ trait CommonTrait
         }
 
         //处理事件
-        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $parentEventId);
+        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $parentEventId, $timeRange);
         if (!empty($eventItem)) {
-            if (!empty($timeRange['start']) && !empty($timeRange['end'])) {
-                if ($eventItem['year'] < $timeRange['start'] || $eventItem['year'] > $timeRange['end']) {
-                    return [ $list, $minTime, $maxTime ];
-                }
-            }
             $list[] = $eventItem;
         }
 

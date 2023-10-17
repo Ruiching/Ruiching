@@ -144,7 +144,7 @@ class IndexRepository extends BaseRepository
             if (!empty($eventIds)) {
                 foreach ($eventIds as $eventId) {
                     //加入本体事件
-                    list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId);
+                    list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId, []);
                     if (!empty($eventItem)) {
                         $events[] = $eventItem;
                     }
