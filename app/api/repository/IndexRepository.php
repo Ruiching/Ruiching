@@ -313,7 +313,7 @@ class IndexRepository extends BaseRepository
                             ->where('formated_time', '>=', $startYear)
                             ->where('formated_time', '<', $endYear)
                             ->count();
-                        $map[$field][$startYear] = empty($eventCount) ? 0 : intval($eventCount);
+                        $map[$field][$i] = empty($eventCount) ? 0 : intval($eventCount);
                     }
                 }
             }
@@ -327,8 +327,13 @@ class IndexRepository extends BaseRepository
     public function getEvolveList($params)
     {
         $events = [];
-        $eventIds = $this->eventEvolveThemeModel->where('theme', $params['theme'])->column('event_id');
-        $list = $this->eventModel->whereIn('event_id', $eventIds)->order('timestamp', 'desc')->select();
+        $eventIds = $this->eventEvolveThemeModel
+            ->where('theme', $params['theme'])
+            ->column('event_id');
+        $list = $this->eventModel
+            ->whereIn('event_id', $eventIds)
+            ->order('timestamp', 'desc')
+            ->select();
         if (!empty($list)) {
             foreach ($list as $item) {
                 //获取下一跳的事件ID
