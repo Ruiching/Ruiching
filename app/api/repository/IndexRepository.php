@@ -277,7 +277,7 @@ class IndexRepository extends BaseRepository
 
         //整理列表
         return [
-            'events' => [],
+            'events' => $events,
             'start_time' => $minTime['year'],
             'end_time' => $maxTime['year'],
             'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
