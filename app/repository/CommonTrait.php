@@ -217,6 +217,11 @@ trait CommonTrait
             ->order('id', 'desc')
             ->value('level_1_name');
 
+        $tags = $this->eventTagModel
+            ->where('event_id', $eventInfo['event_id'])
+            ->order('id', 'desc')
+            ->value('tag');
+
         //整理数据
         return [
             'event_id' => $eventInfo['event_id'],
@@ -225,6 +230,7 @@ trait CommonTrait
             'name' => $eventInfo['name'],
             'object' => $eventInfo['object'],
             'field' => $field,
+            'tags' => empty($tags) ? [] : $tags,
             'relation' => [
                 'parent' => empty($parentEventId) ? '' : $parentEventId,
                 'child' => empty($childEventId) ? '' : $childEventId,
@@ -257,8 +263,7 @@ trait CommonTrait
         list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $childrenEventId);
         if (!empty($eventItem)) {
             if (!empty($timeRange['start']) && !empty($timeRange['end'])) {
-                $year = $this->_handlerEventTimeToYear($eventItem['formated_time']);
-                if ($year < $timeRange['start'] || $year > $timeRange['end']) {
+                if ($eventItem['year'] < $timeRange['start'] || $eventItem['year'] > $timeRange['end']) {
                     return [ $list, $minTime, $maxTime ];
                 }
             }
@@ -290,8 +295,7 @@ trait CommonTrait
         list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $parentEventId);
         if (!empty($eventItem)) {
             if (!empty($timeRange['start']) && !empty($timeRange['end'])) {
-                $year = $this->_handlerEventTimeToYear($eventItem['formated_time']);
-                if ($year < $timeRange['start'] || $year > $timeRange['end']) {
+                if ($eventItem['year'] < $timeRange['start'] || $eventItem['year'] > $timeRange['end']) {
                     return [ $list, $minTime, $maxTime ];
                 }
             }
