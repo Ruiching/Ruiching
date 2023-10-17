@@ -217,10 +217,11 @@ trait CommonTrait
             ->order('id', 'desc')
             ->value('level_1_name');
 
-        $tags = $this->eventTagModel
-            ->where('event_id', $eventInfo['event_id'])
-            ->order('id', 'desc')
-            ->value('tag');
+        //获取关联的标签信息
+        $tags = $this->eventTagModel->alias('et')
+            ->leftjoin('tag t', 't.tag_id = et.tag_id')
+            ->where('et.event_id', $eventInfo['event_id'])
+            ->column('t.name');
 
         //整理数据
         return [
