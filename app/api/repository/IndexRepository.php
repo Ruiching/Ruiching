@@ -239,32 +239,32 @@ class IndexRepository extends BaseRepository
 
         if (!empty($eventIds)) {
             $lists = $this->eventModel->where('event_id', 'in', $eventIds)->select();
-            foreach ($lists as $item) {
-                $item = $this->_handlerEventItem($item);
+            foreach ($lists as $event) {
+                $item = $this->_handlerEventItem($event);
 
                 //年份数据
                 if (empty($minTime['sort'])) {
                     $minTime = [
-                        'year' => $item['formated_time'],
-                        'sort' => $item['timestamp'],
+                        'year' => $event['formated_time'],
+                        'sort' => $event['timestamp'],
                     ];
                 }
                 if (empty($maxTime['sort'])) {
                     $maxTime = [
-                        'year' => $item['formated_time'],
-                        'sort' => $item['timestamp'],
+                        'year' => $event['formated_time'],
+                        'sort' => $event['timestamp'],
                     ];
                 }
-                if ($minTime['sort'] > $item['timestamp'] && !empty($item['formated_time'])) {
+                if ($minTime['sort'] > $event['timestamp'] && !empty($event['formated_time'])) {
                     $minTime = [
-                        'year' => $item['formated_time'],
-                        'sort' => $item['timestamp'],
+                        'year' => $event['formated_time'],
+                        'sort' => $event['timestamp'],
                     ];
                 }
-                if ($maxTime['sort'] < $item['timestamp'] && !empty($item['formated_time'])) {
+                if ($maxTime['sort'] < $event['timestamp'] && !empty($event['formated_time'])) {
                     $maxTime = [
-                        'year' => $item['formated_time'],
-                        'sort' => $item['timestamp'],
+                        'year' => $event['formated_time'],
+                        'sort' => $event['timestamp'],
                     ];
                 }
 
