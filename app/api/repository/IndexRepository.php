@@ -144,10 +144,11 @@ class IndexRepository extends BaseRepository
             if (!empty($eventIds)) {
                 foreach ($eventIds as $eventId) {
                     //加入本体事件
-                    list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId, []);
-                    if (!empty($eventItem)) {
-                        $events[] = $eventItem;
+                    list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $eventId, $timeRange);
+                    if (empty($eventItem)) {
+                        break;
                     }
+                    $events[] = $eventItem;
 
                     //查询下级事件信息
                     list($events, $minTime, $maxTime) = $this->_getChildrenEvent($eventMaxNumber, $timeRange, $events, $minTime, $maxTime, $eventId);
@@ -161,6 +162,12 @@ class IndexRepository extends BaseRepository
                 }
             }
 
+            //时间范围筛选
+            if (!empty($timeRange) && !empty($timeRange['start']) && !empty($timeRange['end'])) {
+                if ($params['time'] < $timeRange['start'] || $params['time'] > $timeRange['end']) {
+                    break;
+                }
+            }
             if (count($events) >= $eventMaxNumber) {
                 break;
             }
