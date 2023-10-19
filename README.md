@@ -1,56 +1,45 @@
-ThinkPHP 6.0
-===============
+### 项目依赖
+1、PHP >= 7.4.3
 
-> 运行环境要求PHP7.2+，兼容PHP8.1
+2、Mysql >= 5.7
 
-[官方应用服务市场](https://market.topthink.com) | [`ThinkAPI`——官方统一API服务](https://docs.topthink.com/think-api)
+### 部署步骤
+1、将项目根目录下文件 .env.production 改名为 .env，修改其中的数据库配置
 
-ThinkPHPV6.0版本由[亿速云](https://www.yisu.com/)独家赞助发布。
+2、将项目根目录下的composer.phar迁移到系统命令文件中，参考命令：mv composer.phar /usr/local/bin/composer,全局替换composer的扩展源：composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
-## 主要新特性
+3、在项目根目录执行命令：composer update
 
-* 采用`PHP7`强类型（严格模式）
-* 支持更多的`PSR`规范
-* 原生多应用支持
-* 更强大和易用的查询
-* 全新的事件系统
-* 模型事件和数据库事件统一纳入事件系统
-* 模板引擎分离出核心
-* 内部功能中间件化
-* SESSION/Cookie机制改进
-* 对Swoole以及协程支持改进
-* 对IDE更加友好
-* 统一和精简大量用法
+4、在项目根目录依次执行命令：php think migrate:run 和 php think seed:run
 
-## 安装
+5、项目运行目录为根目录下的public文件夹
 
-~~~
-composer create-project topthink/think tp 6.0.*
-~~~
+6、nginx需要配置伪静态，参考如下：
+```
+location / {
+    if (!-e $request_filename) {
+        rewrite  ^(.*)$  /index.php?s=/$1  last;
+        break;
+    }
+}
+```
 
-如果需要更新框架使用
-~~~
-composer update topthink/framework
-~~~
+###Docker操作
+1、创建镜像文件：docker build -t science_tree:1.0 .
 
-## 文档
+2、创建容器：docker run -d -p 8282:80, 9000:9000 --name science_tree science_tree:1.0
 
-[完全开发手册](https://www.kancloud.cn/manual/thinkphp6_0/content)
+docker run -d -p 9000:9000 --name science_tree_nginx science_tree:1.0
 
-## 参与开发
+3、查看容器：docker ps -a
 
-请参阅 [ThinkPHP 核心框架包](https://github.com/top-think/framework)。
+4、进入容器：docker exec -it science_tree /bin/bash
 
-## 版权信息
+5、删除容器：docker rm -f science_tree
 
-ThinkPHP遵循Apache2开源协议发布，并提供免费使用。
+####问题：
 
-本项目包含的第三方源码和二进制文件之版权信息另行标注。
-
-版权所有Copyright © 2006-2021 by ThinkPHP (http://thinkphp.cn)
-
-All rights reserved。
-
-ThinkPHP® 商标和著作权所有者为上海顶想信息科技有限公司。
-
-更多细节参阅 [LICENSE.txt](LICENSE.txt)
+1、出现端口占用情况
+```
+通过命名：lsof -i:端口号 查看占用情况
+```

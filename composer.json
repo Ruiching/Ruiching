@@ -56,5 +56,16 @@
             "@php think service:discover",
             "@php think vendor:publish"
         ]
+    },
+    "repositories": {
+        "0": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
+        },
+        "1": {
+            "type": "vcs",
+            "url": "https://dwhb:KxKr7hhY9zT38uzB9qZx@git.umlife.net/duowan/sso-client-php.git"
+        },
+        "packagist.org": false
     }
 }
