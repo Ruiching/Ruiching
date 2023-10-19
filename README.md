@@ -27,15 +27,41 @@ location / {
 ###Docker操作
 1、创建镜像文件：docker build -t science_tree:1.0 .
 
-2、创建容器：docker run -d -p 8282:80, 9000:9000 --name science_tree science_tree:1.0
+2、镜像打包：docker save science_tree:1.0 > science_tree.tar
 
-docker run -d -p 9000:9000 --name science_tree_nginx science_tree:1.0
+3、镜像解压：docker load -i science_tree.tar
 
-3、查看容器：docker ps -a
+4、创建容器：docker run -d -p 8282:8899 --name science_tree science_tree:1.0
 
-4、进入容器：docker exec -it science_tree /bin/bash
+5、查看容器：docker ps -a
 
-5、删除容器：docker rm -f science_tree
+6、进入容器：docker exec -it science_tree /bin/bash
+
+7、删除容器：docker rm -f science_tree
+
+8、进入容器修改配置文件：/var/www/science_tree/.env
+```
+APP_DEBUG = false  #是否开启调试模式
+
+[DATABASE] #数据库配置
+TYPE = mysql #数据库类型
+HOSTNAME = 127.0.0.1 #数据库地址
+DATABASE = science_tree #数据库名
+USERNAME = root #数据库账号
+PASSWORD = 123456 #数据库密码
+HOSTPORT = 3306 #数据库端口
+CHARSET = utf8 #数据库字符编码
+DEBUG = false
+
+[CACHE] #缓存引擎，默认为文件类型
+DRIVER = file
+
+[REDIS] #Redis配置
+HOST = 127.0.0.1
+PORT = 6379
+PASSWORD =
+
+```
 
 ####问题：
 

@@ -17,8 +17,8 @@ RUN install-php-extensions gd
 RUN install-php-extensions redis
 RUN install-php-extensions zip
 RUN install-php-extensions pdo_mysql
-RUN install-php-extensions bcmath
-RUN install-php-extensions sockets
+#RUN install-php-extensions bcmath
+#RUN install-php-extensions sockets
 
 RUN sed -i '2,3d' /usr/local/etc/php/conf.d/docker-vars.ini && \
 echo "post_max_size=60m" >> /usr/local/etc/php/conf.d/docker-vars.ini && \
@@ -28,7 +28,8 @@ echo "php_admin_value[error_reporting] = E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STR
 # 安装依赖
 WORKDIR /var/www/science_tree
 RUN chmod -R 777 runtime && chmod -R 777 public
-RUN php -d memory_limit=-1 /usr/bin/composer install
+RUN rm -rf .git && rm -rf .idea
+#RUN php -d memory_limit=-1 /usr/bin/composer install
 
 EXPOSE 8899
 
