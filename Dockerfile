@@ -1,11 +1,13 @@
 # 构建主镜像
 FROM richarvey/nginx-php-fpm:2.1.2
+#FROM tlinux_science_tree:v1.0
 
 # 复制项目文件
 COPY . /var/www/science_tree
 COPY ./.example.env /var/www/science_tree/.env
-COPY ./deploy/nginx.conf /etc/nginx/sites-enabled/web.conf
-COPY ./deploy/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+COPY ./deploy/web.conf /etc/nginx/sites-enabled/web.conf
+COPY ./deploy/www.conf /usr/local/etc/php-fpm.d/www.conf
+RUN rm -rf /etc/nginx/sites-enabled/default.conf
 
 COPY ./deploy/composer.phar /usr/bin/composer
 RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/

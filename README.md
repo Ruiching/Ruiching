@@ -3,14 +3,29 @@
 
 2、Mysql >= 5.7
 
-### 部署步骤
+### 服务器部署
+
+1、将 ./deploy/www.conf，放入 /etc/php-fpm.d/（PHP-FPM配置） 目录下，重启PHP-FPM服务
+
+2、将 ./deploy/web.conf，放入 /etc/nginx/conf.d/（nginx站点生效） 目录下，重启nginx服务
+
+3、需确保 nginx 和 php-fpm 服务的用户组均为 nginx；相关用户组配置文件如下：
+
+```
+/etc/php-fpm.d/www.conf
+user = nginx
+group = nginx
+
+/etc/nginx/nginx.conf
+user nginx;
+```
+
+### 部署步骤（弃用）
 1、将项目根目录下文件 .env.production 改名为 .env，修改其中的数据库配置
 
 2、将项目根目录下的composer.phar迁移到系统命令文件中，参考命令：mv composer.phar /usr/local/bin/composer,全局替换composer的扩展源：composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
 3、在项目根目录执行命令：composer update
-
-4、在项目根目录依次执行命令：php think migrate:run 和 php think seed:run
 
 5、项目运行目录为根目录下的public文件夹
 
