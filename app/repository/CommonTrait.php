@@ -46,15 +46,19 @@ trait CommonTrait
         return $year;
     }
 
+    public function _getTimestamp($year)
+    {
+        return $year * 372 - 31 - 1;
+    }
+
     public function _queryAllEventV1($params)
     {
-        $query = $this->eventModel
-            ->where('timestamp', '>', 0)
-            ->where('formated_time', '<', '2060年');
+        $query = $this->eventModel;
 
         //时间筛选
         if (isset($params['time']) && !empty($params['time'])) {
-            $query->whereLike('formated_time', "%{$params['time']}年%");
+            $timestamp = $this->_getTimestamp($params['time']);
+            $query = $query->where('timestamp', $timestamp);
         }
 
         //学科筛选
@@ -161,13 +165,12 @@ trait CommonTrait
 
     public function _queryAllEventV3($params)
     {
-        $query = $this->eventModel
-            ->where('timestamp', '>', 0)
-            ->where('formated_time', '<', '2060年');
+        $query = $this->eventModel;
 
         //时间筛选
         if (isset($params['time']) && !empty($params['time'])) {
-            $query->whereLike('formated_time', "%{$params['time']}年%");
+            $timestamp = $this->_getTimestamp($params['time']);
+            $query = $query->where('timestamp', $timestamp);
         }
 
         //学科筛选

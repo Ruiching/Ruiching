@@ -15,20 +15,31 @@ class IndexRepository extends BaseRepository
 
     public function getAllTime()
     {
+//        $startTime = $this->eventModel
+//            ->where('timestamp', '>', 0)
+//            ->where('formated_time', '<', '2060年')
+//            ->order('timestamp', 'asc')
+//            ->value('formated_time');
+//
+//        $endTime = $this->eventModel
+//            ->where('timestamp', '>', 0)
+//            ->where('formated_time', '<', '2060年')
+//            ->order('timestamp', 'desc')
+//            ->value('formated_time');
+//
+//        $startYear = $this->_handlerEventTimeToYear($startTime);
+//        $endYear = $this->_handlerEventTimeToYear($endTime);
+
         $startTime = $this->eventModel
-            ->where('timestamp', '>', 0)
-            ->where('formated_time', '<', '2060年')
             ->order('timestamp', 'asc')
-            ->value('formated_time');
+            ->min('timestamp');
 
         $endTime = $this->eventModel
-            ->where('timestamp', '>', 0)
-            ->where('formated_time', '<', '2060年')
             ->order('timestamp', 'desc')
-            ->value('formated_time');
+            ->max('timestamp');
 
-        $startYear = $this->_handlerEventTimeToYear($startTime);
-        $endYear = $this->_handlerEventTimeToYear($endTime);
+        $startYear = floor(($startTime + 31 + 1) / 372);
+        $endYear = floor(($endTime + 31 + 1) / 372);
 
         return [
             'startYear' => $startYear,
@@ -358,13 +369,12 @@ class IndexRepository extends BaseRepository
             $limitNumber = 100;
         }
 
-        $query = $this->eventModel
-            ->where('timestamp', '>', 0)
-            ->where('formated_time', '<', '2060年');
+        $query = $this->eventModel->order('timestamp', 'desc');
 
         //时间筛选
         if (isset($params['time']) && !empty($params['time'])) {
-            $query = $query->whereLike('formated_time', "%{$params['time']}年%");
+            $timestamp = $this->_getTimestamp($params['time']);
+            $query = $query->where('timestamp', $timestamp);
         }
 
         //学科筛选
@@ -379,7 +389,7 @@ class IndexRepository extends BaseRepository
 
         //查询到的所有事件
         $events = [];
-        $lists = $query->order('timestamp', 'desc')->limit($limitNumber)->select();
+        $lists = $query->limit($limitNumber)->select();
         if (!empty($lists)) {
             foreach ($lists as $item) {
                 $events[] = $this->_handlerEventItem($item);
