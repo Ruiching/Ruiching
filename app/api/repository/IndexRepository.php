@@ -307,7 +307,7 @@ class IndexRepository extends BaseRepository
             'end_time' => $maxTime['year'],
             'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
             'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
-            'count' => count($events),
+            'count' => count($eventIds),
         ];
     }
 
