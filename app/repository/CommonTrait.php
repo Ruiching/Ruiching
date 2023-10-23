@@ -2,6 +2,7 @@
 
 namespace app\repository;
 
+use app\model\Event;
 use app\repository\BaseRepository;
 use think\facade\Cache;
 
@@ -53,7 +54,9 @@ trait CommonTrait
 
     public function _queryAllEventV1($params)
     {
-        $query = $this->eventModel;
+        $query = $this->eventModel
+            ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
+            ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR));
 
         //时间筛选
         if (isset($params['time']) && !empty($params['time'])) {
@@ -105,8 +108,8 @@ trait CommonTrait
     public function _queryAllEventV2($maxNumber, $params)
     {
         $query = $this->eventModel
-            ->where('timestamp', '>', 0)
-            ->where('formated_time', '<', '2060年');
+            ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
+            ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR));
 
         //时间筛选
         if (empty($params['time'])) {
@@ -165,7 +168,9 @@ trait CommonTrait
 
     public function _queryAllEventV3($params)
     {
-        $query = $this->eventModel;
+        $query = $this->eventModel
+            ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
+            ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR));
 
         //时间筛选
         if (isset($params['time']) && !empty($params['time'])) {

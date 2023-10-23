@@ -3,6 +3,7 @@
 
 namespace app\api\repository;
 
+use app\model\Event;
 use app\repository\BaseRepository;
 use app\repository\CommonTrait;
 use app\Request;
@@ -31,10 +32,14 @@ class IndexRepository extends BaseRepository
 //        $endYear = $this->_handlerEventTimeToYear($endTime);
 
         $startTime = $this->eventModel
+            ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
+            ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR))
             ->order('timestamp', 'asc')
             ->min('timestamp');
 
         $endTime = $this->eventModel
+            ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
+            ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR))
             ->order('timestamp', 'desc')
             ->max('timestamp');
 
@@ -369,7 +374,10 @@ class IndexRepository extends BaseRepository
             $limitNumber = 100;
         }
 
-        $query = $this->eventModel->order('timestamp', 'desc');
+        $query = $this->eventModel
+            ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
+            ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR))
+            ->order('timestamp', 'desc');
 
         //时间筛选
         if (isset($params['time']) && !empty($params['time'])) {
