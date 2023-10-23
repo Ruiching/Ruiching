@@ -55,6 +55,7 @@ trait CommonTrait
     public function _queryAllEventV1($params)
     {
         $query = $this->eventModel
+            ->whereNotNull('timestamp')
             ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
             ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR));
 
@@ -89,15 +90,27 @@ trait CommonTrait
 
         //关键词筛选
         if (isset($params['keyword']) && !empty($params['keyword'])) {
-            //事件名称
             $query = $query->whereLike('name|object', "%{$params['keyword']}%");
+        }
 
-            //演进关系
+        //演进关系筛选
+        if (isset($params['theme']) && !empty($params['theme'])) {
             $themeEventIds = $this->eventEvolveThemeModel
-                ->whereLike('theme', "%{$params['keyword']}%")
+                ->whereLike('theme', "%{$params['theme']}%")
                 ->column('event_id');
             if (!empty($subjectEventIds)) {
-                $query = $query->whereOr('event_id', 'in', $themeEventIds);
+                $query = $query->whereIn('event_id', $themeEventIds);
+            }
+        }
+
+        // 标签筛选
+        if (isset($params['tag']) && !empty($params['tag'])) {
+            $tagEventIds = $this->eventTagModel->alias('et')
+                ->leftjoin('tag t', 't.tag_id = et.tag_id')
+                ->whereLike('t.name', "%{$params['tag']}%")
+                ->column('et.event_id');
+            if (!empty($tagEventIds)) {
+                $query = $query->whereIn('event_id', $tagEventIds);
             }
         }
 
@@ -108,6 +121,7 @@ trait CommonTrait
     public function _queryAllEventV2($maxNumber, $params)
     {
         $query = $this->eventModel
+            ->whereNotNull('timestamp')
             ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
             ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR));
 
@@ -142,15 +156,27 @@ trait CommonTrait
 
         //关键词筛选
         if (isset($params['keyword']) && !empty($params['keyword'])) {
-            //事件名称
             $query = $query->whereLike('name|object', "%{$params['keyword']}%");
+        }
 
-            //演进关系
+        //演进关系筛选
+        if (isset($params['theme']) && !empty($params['theme'])) {
             $themeEventIds = $this->eventEvolveThemeModel
-                ->whereLike('theme', "%{$params['keyword']}%")
+                ->whereLike('theme', "%{$params['theme']}%")
                 ->column('event_id');
             if (!empty($subjectEventIds)) {
-                $query = $query->whereOr('event_id', 'in', $themeEventIds);
+                $query = $query->whereIn('event_id', $themeEventIds);
+            }
+        }
+
+        // 标签筛选
+        if (isset($params['tag']) && !empty($params['tag'])) {
+            $tagEventIds = $this->eventTagModel->alias('et')
+                ->leftjoin('tag t', 't.tag_id = et.tag_id')
+                ->whereLike('t.name', "%{$params['tag']}%")
+                ->column('et.event_id');
+            if (!empty($tagEventIds)) {
+                $query = $query->whereIn('event_id', $tagEventIds);
             }
         }
 
@@ -169,6 +195,7 @@ trait CommonTrait
     public function _queryAllEventV3($params)
     {
         $query = $this->eventModel
+            ->whereNotNull('timestamp')
             ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
             ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR));
 
@@ -203,15 +230,27 @@ trait CommonTrait
 
         //关键词筛选
         if (isset($params['keyword']) && !empty($params['keyword'])) {
-            //事件名称
             $query = $query->whereLike('name|object', "%{$params['keyword']}%");
+        }
 
-            //演进关系
+        //演进关系筛选
+        if (isset($params['theme']) && !empty($params['theme'])) {
             $themeEventIds = $this->eventEvolveThemeModel
-                ->whereLike('theme', "%{$params['keyword']}%")
+                ->whereLike('theme', "%{$params['theme']}%")
                 ->column('event_id');
             if (!empty($subjectEventIds)) {
-                $query = $query->whereOr('event_id', 'in', $themeEventIds);
+                $query = $query->whereIn('event_id', $themeEventIds);
+            }
+        }
+
+        // 标签筛选
+        if (isset($params['tag']) && !empty($params['tag'])) {
+            $tagEventIds = $this->eventTagModel->alias('et')
+                ->leftjoin('tag t', 't.tag_id = et.tag_id')
+                ->whereLike('t.name', "%{$params['tag']}%")
+                ->column('et.event_id');
+            if (!empty($tagEventIds)) {
+                $query = $query->whereIn('event_id', $tagEventIds);
             }
         }
 

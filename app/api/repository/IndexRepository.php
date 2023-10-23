@@ -32,12 +32,14 @@ class IndexRepository extends BaseRepository
 //        $endYear = $this->_handlerEventTimeToYear($endTime);
 
         $startTime = $this->eventModel
+            ->whereNotNull('timestamp')
             ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
             ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR))
             ->order('timestamp', 'asc')
             ->min('timestamp');
 
         $endTime = $this->eventModel
+            ->whereNotNull('timestamp')
             ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
             ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR))
             ->order('timestamp', 'desc')
@@ -344,10 +346,13 @@ class IndexRepository extends BaseRepository
     {
         $events = [];
         $eventIds = $this->eventEvolveThemeModel
-            ->where('theme', $params['theme'])
+            ->whereLike('theme', "%{$params['theme']}%")
             ->column('event_id');
         $list = $this->eventModel
             ->whereIn('event_id', $eventIds)
+            ->whereNotNull('timestamp')
+            ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
+            ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR))
             ->order('timestamp', 'desc')
             ->select();
         if (!empty($list)) {
@@ -375,6 +380,7 @@ class IndexRepository extends BaseRepository
         }
 
         $query = $this->eventModel
+            ->whereNotNull('timestamp')
             ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
             ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR))
             ->order('timestamp', 'desc');
