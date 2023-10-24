@@ -68,7 +68,7 @@ trait CommonTrait
         //学科筛选
         if (isset($params['field']) && !empty($params['field'])) {
             $fieldEventIds = $this->eventFieldModel
-                ->whereLike('level_1_name', $params['field'])
+                ->where('level_1_name', $params['field'])
                 ->column('event_id');
             if (!empty($fieldEventIds)) {
                 $query = $query->whereIn('event_id', $fieldEventIds);
@@ -313,12 +313,12 @@ trait CommonTrait
         //下一级事件
         $childEventId = $this->eventRelationModel
             ->where('target_event_id', $eventInfo['event_id'])
-            ->value('source_event_id');
+            ->column('source_event_id');
 
         //上一级事件
         $parentEventId = $this->eventRelationModel
             ->where('source_event_id', $eventInfo['event_id'])
-            ->value('target_event_id');
+            ->column('target_event_id');
 
         //查找是否存在于演进主题中
         $evolveTheme = $this->eventEvolveThemeModel
@@ -413,7 +413,8 @@ trait CommonTrait
     {
         //查找事件
         $nowEventIds = $this->eventRelationModel->alias('er')
-            ->join('event e', 'e.event_id = er.target_event_id')
+            ->leftJoin('event e', 'e.event_id = er.source_event_id')
+            ->whereNotNull('e.timestamp')
             ->where('e.timestamp', '>=', $this->_getTimestamp($timeRange['start']))
             ->where('e.timestamp', '<=', $this->_getTimestamp($timeRange['end']))
             ->whereIn('er.target_event_id', $eventId)
@@ -481,7 +482,8 @@ trait CommonTrait
     {
         //查找事件
         $nowEventIds = $this->eventRelationModel->alias('er')
-            ->join('event e', 'e.event_id = er.source_event_id')
+            ->leftJoin('event e', 'e.event_id = er.target_event_id')
+            ->whereNotNull('e.timestamp')
             ->where('e.timestamp', '>=', $this->_getTimestamp($timeRange['start']))
             ->where('e.timestamp', '<=', $this->_getTimestamp($timeRange['end']))
             ->whereIn('er.source_event_id', $eventId)
