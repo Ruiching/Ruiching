@@ -395,7 +395,7 @@ trait CommonTrait
             ->column('source_event_id');*/
 
         $childrenEventId = $this->eventRelationModel->alias('er')
-            ->leftjoin('events e', 'e.event_id = er.target_event_id')
+            ->leftjoin('event e', 'e.event_id = er.target_event_id')
             ->where('e.timestamp', '>=', $this->_getTimestamp($startTime))
             ->where('e.timestamp', '<=', $this->_getTimestamp($endTime))
             ->whereIn('er.target_event_id', $parentEventIds)
@@ -443,7 +443,7 @@ trait CommonTrait
 //            ->column('target_event_id');
 
         $parentEventId = $this->eventRelationModel->alias('er')
-            ->leftjoin('events e', 'e.event_id = er.source_event_id')
+            ->leftjoin('event e', 'e.event_id = er.source_event_id')
             ->where('e.timestamp', '>=', $this->_getTimestamp($startTime))
             ->where('e.timestamp', '<=', $this->_getTimestamp($endTime))
             ->whereIn('er.source_event_id', $childrenEventIds)
