@@ -98,7 +98,7 @@ trait CommonTrait
             $themeEventIds = $this->eventEvolveThemeModel
                 ->whereLike('theme', "%{$params['theme']}%")
                 ->column('event_id');
-            if (!empty($subjectEventIds)) {
+            if (!empty($themeEventIds)) {
                 $query = $query->whereIn('event_id', $themeEventIds);
             }
         }
@@ -409,6 +409,24 @@ trait CommonTrait
         return $childrenEventId;
     }
 
+    public function _getChildrenEventV2($timeRange, $eventId, $childrenEventIds)
+    {
+        //查找事件
+        $nowEventIds = $this->eventRelationModel->alias('er')
+            ->join('event e', 'e.event_id = er.target_event_id')
+            ->where('e.timestamp', '>=', $this->_getTimestamp($timeRange['start']))
+            ->where('e.timestamp', '<=', $this->_getTimestamp($timeRange['end']))
+            ->whereIn('er.target_event_id', $eventId)
+            ->column('er.source_event_id');
+
+        //没有事件，直接返回
+        if (empty($nowEventIds)) {
+            return $childrenEventIds;
+        }
+        $childrenEventIds = array_merge($childrenEventIds, $nowEventIds);
+        return $this->_getChildrenEventV2($timeRange, $nowEventIds, $childrenEventIds);
+    }
+
     public function _getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $eventId)
     {
         //够数量，直接返回
@@ -457,6 +475,24 @@ trait CommonTrait
             return [];
         }
         return $parentEventId;
+    }
+
+    public function _getParentEventV2($timeRange, $eventId, $parentEventIds)
+    {
+        //查找事件
+        $nowEventIds = $this->eventRelationModel->alias('er')
+            ->join('event e', 'e.event_id = er.source_event_id')
+            ->where('e.timestamp', '>=', $this->_getTimestamp($timeRange['start']))
+            ->where('e.timestamp', '<=', $this->_getTimestamp($timeRange['end']))
+            ->whereIn('er.source_event_id', $eventId)
+            ->column('er.target_event_id');
+
+        //没有事件，直接返回
+        if (empty($nowEventIds)) {
+            return $parentEventIds;
+        }
+        $parentEventIds = array_merge($parentEventIds, $nowEventIds);
+        return $this->_getParentEventV2($timeRange, $nowEventIds, $parentEventIds);
     }
 
     public function _getNextEvent($eventId, $checkEventIds)

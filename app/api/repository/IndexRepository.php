@@ -333,6 +333,110 @@ class IndexRepository extends BaseRepository
         ];
     }
 
+    public function getEventListV3($params)
+    {
+        $eventMaxNumber = !empty($params['max_number']) ? intval($params['max_number']) : 200;
+        if ($eventMaxNumber > 500) {
+            $eventMaxNumber = 500;
+        }
+
+        $eventTimeRange = !empty($params['time_range']) ? intval($params['time_range']) : 0;
+        $timeRange = [
+            'start' => $params['time'] - $eventTimeRange,
+            'end' => $params['time'] + $eventTimeRange,
+        ];
+
+        $i = 1;
+        $eventIds = [];
+        while (true) {
+            $topIds = $this->_queryAllEventV1($params);
+            if (!empty($topIds)) {
+                $eventIds = array_merge($eventIds, $topIds);
+                foreach ($topIds as $topId) {
+                    //查询下级事件信息
+                    $childrenEventIds = [];
+                    $childrenEventIds = $this->_getChildrenEventV2($timeRange, $topId, $childrenEventIds);
+                    $eventIds = array_merge($eventIds, $childrenEventIds);
+
+                    //查询上级事件信息
+                    $parentEventIds = [];
+                    $parentEventIds = $this->_getParentEventV2($timeRange, $topId, $parentEventIds);
+                    $eventIds = array_merge($eventIds, $parentEventIds);
+
+                    //去重
+                    $eventIds = array_unique($eventIds);
+                }
+            }
+            if (!empty($timeRange) && !empty($timeRange['start']) && !empty($timeRange['end'])) {
+                if ($params['time'] < $timeRange['start'] || $params['time'] > $timeRange['end']) {
+                    break;
+                }
+            }
+
+            if (count($eventIds) >= $eventMaxNumber) {
+                break;
+            }
+
+            $params['time'] = $i % 2 == 0 ? ($params['time'] - $i) : ($params['time'] + $i);
+            $i++;
+        }
+
+        $events = [];
+        $minTime = $maxTime = [
+            'year' => '',
+            'sort' => 0,
+        ];
+        if (!empty($eventIds)) {
+            $lists = $this->eventModel->where('event_id', 'in', $eventIds)->select();
+            foreach ($lists as $listItem) {
+                $item = $this->_handlerEventItem($listItem);
+
+                //年份数据
+                if (empty($minTime['sort'])) {
+                    $minTime = [
+                        'year' => $listItem['formated_time'],
+                        'sort' => $listItem['timestamp'],
+                    ];
+                }
+                if (empty($maxTime['sort'])) {
+                    $maxTime = [
+                        'year' => $listItem['formated_time'],
+                        'sort' => $listItem['timestamp'],
+                    ];
+                }
+                if ($minTime['sort'] > $listItem['timestamp'] && !empty($listItem['formated_time'])) {
+                    $minTime = [
+                        'year' => $listItem['formated_time'],
+                        'sort' => $listItem['timestamp'],
+                    ];
+                }
+                if ($maxTime['sort'] < $listItem['timestamp'] && !empty($listItem['formated_time'])) {
+                    $maxTime = [
+                        'year' => $listItem['formated_time'],
+                        'sort' => $listItem['timestamp'],
+                    ];
+                }
+
+                if (!isset($events[$item['field']])) {
+                    $events[$item['field']] = [];
+                }
+                if (empty($events[$item['field']]['field'])) {
+                    $events[$item['field']]['field'] = $item['field'];
+                }
+                $events[$item['field']]['events'][] = $item;
+            }
+        }
+
+        return [
+            'events' => $events,
+            'start_time' => $minTime['year'],
+            'end_time' => $maxTime['year'],
+            'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
+            'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
+            'count' => count($events),
+        ];
+    }
+
     public function getEventMap($params)
     {
         if (isset($params['op']) && $params['op'] == 'refresh') {
