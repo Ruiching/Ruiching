@@ -323,7 +323,7 @@ trait CommonTrait
         //查找是否存在于演进主题中
         $evolveTheme = $this->eventEvolveThemeModel
             ->where('event_id', $eventInfo['event_id'])
-            ->value('theme');
+            ->column('theme');
 
         //获取关联的学科信息
         $fieldInfo = $this->eventFieldModel
@@ -350,12 +350,12 @@ trait CommonTrait
             'field_level_0' => $fieldInfo['level_0_name'],
             'tags' => empty($tags) ? [] : $tags,
             'relation' => [
-                'parent' => empty($parentEventId) ? '' : $parentEventId,
-                'child' => empty($childEventId) ? '' : $childEventId,
+                'parent' => empty($parentEventId) ? [] : $parentEventId,
+                'child' => empty($childEventId) ? [] : $childEventId,
             ],
             'evolve_info' => [
                 'has' => !empty($evolveTheme),
-                'theme' => empty($evolveTheme) ? "" : $evolveTheme,
+                'theme' => empty($evolveTheme) ? [] : $evolveTheme,
             ],
         ];
     }
