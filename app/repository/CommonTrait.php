@@ -363,9 +363,9 @@ trait CommonTrait
     public function _getChildrenEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $eventId)
     {
         //够数量，直接返回
-        if (count($list) >= $maxNumber) {
-            return [ $list, $minTime, $maxTime ];
-        }
+//        if (count($list) >= $maxNumber) {
+//            return [ $list, $minTime, $maxTime ];
+//        }
 
         //查找事件
         $childrenEventIds = $this->eventRelationModel
@@ -412,9 +412,9 @@ trait CommonTrait
     public function _getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $eventId)
     {
         //够数量，直接返回
-        if (count($list) >= $maxNumber) {
-            return [ $list, $minTime, $maxTime ];
-        }
+//        if (count($list) >= $maxNumber) {
+//            return [ $list, $minTime, $maxTime ];
+//        }
 
         //查找事件
         $parentEventIds = $this->eventRelationModel
