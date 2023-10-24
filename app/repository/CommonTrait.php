@@ -368,23 +368,24 @@ trait CommonTrait
         }
 
         //查找事件
-        $childrenEventId = $this->eventRelationModel
+        $childrenEventIds = $this->eventRelationModel
             ->where('target_event_id', $eventId)
             ->column('source_event_id');
 
         //没有事件，直接返回
-        if (empty($childrenEventId)) {
+        if (empty($childrenEventIds)) {
             return [ $list, $minTime, $maxTime ];
         }
 
         //处理事件
-        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $childrenEventId, $timeRange);
-        if (!empty($eventItem)) {
-            $list[] = $eventItem;
+        foreach ($childrenEventIds as $childrenEventId) {
+            list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $childrenEventId, $timeRange);
+            if (!empty($eventItem)) {
+                $list[] = $eventItem;
+            }
+            //递归查询
+            return $this->_getChildrenEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $childrenEventId);
         }
-
-        //递归查询
-        return $this->_getChildrenEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $childrenEventId);
     }
 
     public function _getChildrenEventV1($startTime, $endTime, $parentEventIds)
@@ -416,23 +417,25 @@ trait CommonTrait
         }
 
         //查找事件
-        $parentEventId = $this->eventRelationModel
+        $parentEventIds = $this->eventRelationModel
             ->where('source_event_id', $eventId)
             ->column('target_event_id');
 
         //没有事件，直接返回
-        if (empty($parentEventId)) {
+        if (empty($parentEventIds)) {
             return [ $list, $minTime, $maxTime ];
         }
 
         //处理事件
-        list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $parentEventId, $timeRange);
-        if (!empty($eventItem)) {
-            $list[] = $eventItem;
-        }
+        foreach ($parentEventIds as $parentEventId) {
+            list($eventItem, $minTime, $maxTime) = $this->_handlerEvent($minTime, $maxTime, $parentEventId, $timeRange);
+            if (!empty($eventItem)) {
+                $list[] = $eventItem;
+            }
 
-        //递归查询
-        return $this->_getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $parentEventId);
+            //递归查询
+            return $this->_getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $parentEventId);
+        }
     }
 
     public function _getParentEventV1($startTime, $endTime, $childrenEventIds)
