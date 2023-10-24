@@ -337,6 +337,7 @@ trait CommonTrait
             'time' => $eventInfo['time'],
             'name' => $eventInfo['name'],
             'object' => $eventInfo['object'],
+            'field' => $fieldInfo['level_1_name'],
             'field_level_1' => $fieldInfo['level_1_name'],
             'field_level_0' => $fieldInfo['level_0_name'],
             'tags' => empty($tags) ? [] : $tags,

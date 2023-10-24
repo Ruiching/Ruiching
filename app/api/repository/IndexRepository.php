@@ -198,13 +198,18 @@ class IndexRepository extends BaseRepository
         //整理列表
         if (!empty($events)) {
             foreach ($events as $item) {
-                if (empty($events[$item['field_level_0']]['field'])) {
-                    $events[$item['field_level_0']]['field'] = $item['field_level_0'];
+                if (empty($events[$item['field']]['field'])) {
+                    $events[$item['field']]['field'] = $item['field'];
                 }
-                if (empty($events[$item['field_level_0']]['children'][$item['field_level_1']]['field'])) {
-                    $events[$item['field_level_0']]['children'][$item['field_level_1']]['field'] = $item['field_level_1'];
-                }
-                $events[$item['field_level_0']]['children'][$item['field_level_1']]['events'][] = $item;
+                $events[$item['field']]['events'][] = $item;
+
+//                if (empty($events[$item['field_level_0']]['field'])) {
+//                    $events[$item['field_level_0']]['field'] = $item['field_level_0'];
+//                }
+//                if (empty($events[$item['field_level_0']]['children'][$item['field_level_1']]['field'])) {
+//                    $events[$item['field_level_0']]['children'][$item['field_level_1']]['field'] = $item['field_level_1'];
+//                }
+//                $events[$item['field_level_0']]['children'][$item['field_level_1']]['events'][] = $item;
             }
         }
 
@@ -295,13 +300,18 @@ class IndexRepository extends BaseRepository
                     ];
                 }
 
-                if (empty($events[$item['field_level_0']]['field'])) {
-                    $events[$item['field_level_0']]['field'] = $item['field_level_0'];
+                if (empty($events[$item['field']]['field'])) {
+                    $events[$item['field']]['field'] = $item['field'];
                 }
-                if (empty($events[$item['field_level_0']]['children'][$item['field_level_1']]['field'])) {
-                    $events[$item['field_level_0']]['children'][$item['field_level_1']]['field'] = $item['field_level_1'];
-                }
-                $events[$item['field_level_0']]['children'][$item['field_level_1']]['events'][] = $item;
+                $events[$item['field']]['events'][] = $item;
+
+//                if (empty($events[$item['field_level_0']]['field'])) {
+//                    $events[$item['field_level_0']]['field'] = $item['field_level_0'];
+//                }
+//                if (empty($events[$item['field_level_0']]['children'][$item['field_level_1']]['field'])) {
+//                    $events[$item['field_level_0']]['children'][$item['field_level_1']]['field'] = $item['field_level_1'];
+//                }
+//                $events[$item['field_level_0']]['children'][$item['field_level_1']]['events'][] = $item;
             }
         }
 
