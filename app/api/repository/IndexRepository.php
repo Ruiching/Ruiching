@@ -209,6 +209,7 @@ class IndexRepository extends BaseRepository
                 if (empty($events[$item['field_level_0']]['field'])) {
                     $events[$item['field_level_0']]['field'] = $item['field_level_0'];
                 }
+                $events[$item['field_level_0']]['field']['children'] = [];
                 if (empty($events[$item['field_level_0']]['field']['children'][$item['field_level_1']]['field'])) {
                     $events[$item['field_level_0']]['field']['children'][$item['field_level_1']]['field'] = $item['field_level_1'];
                 }
@@ -299,6 +300,7 @@ class IndexRepository extends BaseRepository
                 if (empty($events[$item['field_level_0']]['field'])) {
                     $events[$item['field_level_0']]['field'] = $item['field_level_0'];
                 }
+                $events[$item['field_level_0']]['field']['children'] = [];
                 if (empty($events[$item['field_level_0']]['field']['children'][$item['field_level_1']]['field'])) {
                     $events[$item['field_level_0']]['field']['children'][$item['field_level_1']]['field'] = $item['field_level_1'];
                 }
