@@ -227,7 +227,7 @@ class IndexRepository extends BaseRepository
             'sort' => 0,
         ];
 
-        $timeRange = !empty($params['time_range']) ? intval($params['time_range']) : 0;
+        $timeRange = !empty($params['time_range']) ? intval($params['time_range']) : 100;
         $maxLevel = !empty($params['max_level']) ? intval($params['max_level']) : 10;
         if ($maxLevel > 10) {
             $maxLevel = 10;

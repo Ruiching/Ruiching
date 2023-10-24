@@ -238,7 +238,7 @@ trait CommonTrait
             $themeEventIds = $this->eventEvolveThemeModel
                 ->whereLike('theme', "%{$params['theme']}%")
                 ->column('event_id');
-            if (!empty($subjectEventIds)) {
+            if (!empty($themeEventIds)) {
                 $query = $query->whereIn('event_id', $themeEventIds);
             }
         }
