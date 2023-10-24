@@ -195,13 +195,23 @@ class IndexRepository extends BaseRepository
             $i++;
         }
 
+        $lists = [
+            'events' => [],
+            'start_time' => $minTime['year'],
+            'end_time' => $maxTime['year'],
+            'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
+            'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
+            'count' => count($events),
+        ];
+
         //整理列表
         if (!empty($events)) {
             foreach ($events as $item) {
-                if (empty($events[$item['field']]['field'])) {
-                    $events[$item['field']]['field'] = $item['field'];
+
+                if (empty($lists['events'][$item['field']]['field'])) {
+                    $lists['events'][$item['field']]['field'] = $item['field'];
                 }
-                $events[$item['field']]['events'][] = $item;
+                $lists['events'][$item['field']]['events'][] = $item;
 
 //                if (empty($events[$item['field_level_0']]['field'])) {
 //                    $events[$item['field_level_0']]['field'] = $item['field_level_0'];
@@ -213,14 +223,7 @@ class IndexRepository extends BaseRepository
             }
         }
 
-        return [
-            'events' => $events,
-            'start_time' => $minTime['year'],
-            'end_time' => $maxTime['year'],
-            'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
-            'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
-            'count' => count($events),
-        ];
+        return $lists;
     }
 
     public function getEventListV2($params)
