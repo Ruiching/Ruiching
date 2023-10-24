@@ -199,6 +199,14 @@ trait CommonTrait
             ->where('timestamp', '>=', $this->_getTimestamp(Event::START_YEAR))
             ->where('timestamp', '<=', $this->_getTimestamp(Event::END_YEAR));
 
+        if (isset($params['start_time']) && !empty($params['start_time'])) {
+            $query = $query->where('timestamp', '>=', $this->_getTimestamp($params['start_time']));
+        }
+
+        if (isset($params['end_time']) && !empty($params['end_time'])) {
+            $query = $query->where('timestamp', '<=', $this->_getTimestamp($params['end_time']));
+        }
+
         //时间筛选
         if (isset($params['time']) && !empty($params['time'])) {
             $timestamp = $this->_getTimestamp($params['time']);
@@ -362,7 +370,7 @@ trait CommonTrait
         //查找事件
         $childrenEventId = $this->eventRelationModel
             ->where('target_event_id', $eventId)
-            ->value('source_event_id');
+            ->column('source_event_id');
 
         //没有事件，直接返回
         if (empty($childrenEventId)) {
@@ -379,12 +387,19 @@ trait CommonTrait
         return $this->_getChildrenEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $childrenEventId);
     }
 
-    public function _getChildrenEventV1($parentEventIds)
+    public function _getChildrenEventV1($startTime, $endTime, $parentEventIds)
     {
         //查找事件
-        $childrenEventId = $this->eventRelationModel
+        /*$childrenEventId = $this->eventRelationModel
             ->whereIn('target_event_id', $parentEventIds)
-            ->column('source_event_id');
+            ->column('source_event_id');*/
+
+        $childrenEventId = $this->eventRelationModel->alias('er')
+            ->leftjoin('events e', 'e.event_id = er.target_event_id')
+            ->where('e.timestamp', '>=', $this->_getTimestamp($startTime))
+            ->where('e.timestamp', '<=', $this->_getTimestamp($endTime))
+            ->whereIn('er.target_event_id', $parentEventIds)
+            ->column('er.source_event_id');
 
         //没有事件，直接返回
         if (empty($childrenEventId)) {
@@ -403,7 +418,7 @@ trait CommonTrait
         //查找事件
         $parentEventId = $this->eventRelationModel
             ->where('source_event_id', $eventId)
-            ->value('target_event_id');
+            ->column('target_event_id');
 
         //没有事件，直接返回
         if (empty($parentEventId)) {
@@ -420,12 +435,19 @@ trait CommonTrait
         return $this->_getParentEvent($maxNumber, $timeRange, $list, $minTime, $maxTime, $parentEventId);
     }
 
-    public function _getParentEventV1($childrenEventIds)
+    public function _getParentEventV1($startTime, $endTime, $childrenEventIds)
     {
         //查找事件
-        $parentEventId = $this->eventRelationModel
-            ->whereIn('source_event_id', $childrenEventIds)
-            ->column('target_event_id');
+//        $parentEventId = $this->eventRelationModel
+//            ->whereIn('source_event_id', $childrenEventIds)
+//            ->column('target_event_id');
+
+        $parentEventId = $this->eventRelationModel->alias('er')
+            ->leftjoin('events e', 'e.event_id = er.source_event_id')
+            ->where('e.timestamp', '>=', $this->_getTimestamp($startTime))
+            ->where('e.timestamp', '<=', $this->_getTimestamp($endTime))
+            ->whereIn('er.source_event_id', $childrenEventIds)
+            ->column('er.target_event_id');
 
         //没有事件，直接返回
         if (empty($parentEventId)) {

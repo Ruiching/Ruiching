@@ -234,11 +234,15 @@ class IndexRepository extends BaseRepository
             'sort' => 0,
         ];
 
+        $params['time'] = empty($params['time']) ? 2023 : intval($params['time']);
         $timeRange = !empty($params['time_range']) ? intval($params['time_range']) : 100;
         $maxLevel = !empty($params['max_level']) ? intval($params['max_level']) : 10;
         if ($maxLevel > 10) {
             $maxLevel = 10;
         }
+
+        $params['start_time'] = $params['time'] - $timeRange;
+        $params['end_time'] = $params['time'] + $timeRange;
 
         $eventIds = [];
         $topIds = [];
@@ -251,7 +255,7 @@ class IndexRepository extends BaseRepository
             $queryChildrenIds = $queryParentIds = $topIds;
             //查询下级事件信息
             for ($i = 1; $i <= $maxLevel; $i++) {
-                $childrenIds = $this->_getChildrenEventV1($queryChildrenIds);
+                $childrenIds = $this->_getChildrenEventV1($params['start_time'], $params['end_time'], $queryChildrenIds);
                 if (empty($childrenIds)) {
                     break;
                 }
@@ -260,7 +264,7 @@ class IndexRepository extends BaseRepository
             }
             //查询上级事件信息
             for ($i = 1; $i <= $maxLevel; $i++) {
-                $parentIds = $this->_getParentEventV1($queryParentIds);
+                $parentIds = $this->_getParentEventV1($params['start_time'], $params['end_time'], $queryParentIds);
                 if (empty($parentIds)) {
                     break;
                 }
