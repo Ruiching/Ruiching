@@ -196,14 +196,6 @@ class IndexRepository extends BaseRepository
         }
 
         //整理列表
-        $lists = [
-            'events' => [],
-            'start_time' => $minTime['year'],
-            'end_time' => $maxTime['year'],
-            'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
-            'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
-            'count' => count($events),
-        ];
         if (!empty($events)) {
             foreach ($events as $item) {
                 if (empty($events[$item['field_level_0']]['field'])) {
@@ -216,7 +208,14 @@ class IndexRepository extends BaseRepository
             }
         }
 
-        return $lists;
+        return [
+            'events' => $events,
+            'start_time' => $minTime['year'],
+            'end_time' => $maxTime['year'],
+            'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
+            'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
+            'count' => count($events),
+        ];
     }
 
     public function getEventListV2($params)
