@@ -318,10 +318,11 @@ trait CommonTrait
             ->value('theme');
 
         //获取关联的学科信息
-        $field = $this->eventFieldModel
+        $fieldInfo = $this->eventFieldModel
             ->where('event_id', $eventInfo['event_id'])
             ->order('id', 'desc')
-            ->value('level_1_name');
+            ->field('level_0_name, level_1_name')
+            ->find();
 
         //获取关联的标签信息
         $tags = $this->eventTagModel->alias('et')
@@ -336,7 +337,8 @@ trait CommonTrait
             'time' => $eventInfo['time'],
             'name' => $eventInfo['name'],
             'object' => $eventInfo['object'],
-            'field' => $field,
+            'field_level_1' => $fieldInfo['level_1_name'],
+            'field_level_0' => $fieldInfo['level_0_name'],
             'tags' => empty($tags) ? [] : $tags,
             'relation' => [
                 'parent' => empty($parentEventId) ? '' : $parentEventId,
