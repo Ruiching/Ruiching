@@ -447,15 +447,13 @@ class IndexRepository extends BaseRepository
                 $eventIds = $this->eventFieldModel->where('level_1_name', $field)->column('event_id');
                 if (!empty($eventIds)) {
                     // 根据时间进行分组
-                    $mixTime = -3000;
-                    $maxTime = 2060;
+                    $mixTime = Event::START_YEAR;
+                    $maxTime = Event::END_YEAR;
                     for ($i = $mixTime; $i <= $maxTime; $i += 100) {
-                        $startYear = $i . "年";
-                        $endYear = ($i + 100) . "年";
                         $eventCount = $this->eventModel
                             ->whereIn('event_id', $eventIds)
-                            ->where('formated_time', '>=', $startYear)
-                            ->where('formated_time', '<', $endYear)
+                            ->where('timestamp', '>=', $this->_getTimestamp($i))
+                            ->where('timestamp', '<', $this->_getTimestamp($i + 100))
                             ->count();
                         $map[$field][$i] = empty($eventCount) ? 0 : intval($eventCount);
                     }
