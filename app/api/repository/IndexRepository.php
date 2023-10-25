@@ -448,7 +448,7 @@ class IndexRepository extends BaseRepository
                 if (!empty($eventIds)) {
                     // 根据时间进行分组
                     $mixTime = Event::START_YEAR;
-                    $maxTime = Event::END_YEAR;
+                    $maxTime = Event::END_YEAR + 40;
                     for ($i = $mixTime; $i <= $maxTime; $i += 100) {
                         $eventCount = $this->eventModel
                             ->whereIn('event_id', $eventIds)
