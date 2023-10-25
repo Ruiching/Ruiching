@@ -452,6 +452,7 @@ class IndexRepository extends BaseRepository
                     for ($i = $mixTime; $i <= $maxTime; $i += 100) {
                         $eventCount = $this->eventModel
                             ->whereIn('event_id', $eventIds)
+                            ->whereNotNull('timestamp')
                             ->where('timestamp', '>=', $this->_getTimestamp($i))
                             ->where('timestamp', '<', $this->_getTimestamp($i + 100))
                             ->count();
