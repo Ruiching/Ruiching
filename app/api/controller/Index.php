@@ -5,17 +5,19 @@ namespace app\api\controller;
 
 use app\api\repository\IndexRepository;
 use app\BaseController;
+use app\service\TokenService;
 use think\App;
 use think\facade\Request;
 use think\facade\Validate;
 
-class Index extends BaseController
+class Index extends Auth
 {
     protected $repository;
 
-    public function __construct(App $app)
+    public function __construct(App $app, Request $request)
     {
-        parent::__construct($app);
+        parent::__construct($app, $request);
+
         header('Access-Control-Allow-Origin:*');
         $this->repository = new IndexRepository();
     }
@@ -62,21 +64,6 @@ class Index extends BaseController
     {
         if (Request::isPost()){
             $lists = $this->repository->getEventListV3($request::param());
-            return success('事件列表', $lists);
-        }else{
-            return error('非法请求');
-        }
-    }
-
-    /**
-     * 获取事件
-     * @param Request $request
-     * @return array
-     */
-    public function eventsV2(Request $request)
-    {
-        if (Request::isPost()){
-            $lists = $this->repository->getEventListV2($request::param());
             return success('事件列表', $lists);
         }else{
             return error('非法请求');

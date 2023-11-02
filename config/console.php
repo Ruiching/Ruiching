@@ -5,7 +5,7 @@
 return [
     // 指令定义
     'commands' => [
-        //定时处理过期的启动二维码, 每分钟 php think check_start_qr
-        //'check_start_qr' => 'app\command\CheckStartQr',
+        //定时更新地图分布数据, 每3小时执行 php think update_event_map
+        'update_event_map' => 'app\command\UpdateEventMap',
     ],
 ];

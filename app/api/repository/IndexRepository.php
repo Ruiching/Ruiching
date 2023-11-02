@@ -460,7 +460,7 @@ class IndexRepository extends BaseRepository
                     }
                 }
             }
-            Cache::set('event_map', $map, 86400 * 30);
+            Cache::set('event_map', $map, 86400);
         } else {
             $map = Cache::get('event_map');
         }

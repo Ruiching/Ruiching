@@ -58,6 +58,17 @@ location / {
 ```
 APP_DEBUG = false  #是否开启调试模式
 
+[APP] #应用配置
+USER_LOGIN_TOKEN = 4gVYC0mFjG4xr16osbz5jSXQQxPJbCJr #账号标识符，32位字符串
+USER_LOGIN_NAME = admin #登录账号
+USER_LOGIN_PASSWORD = admin123 #登录密码
+PROJECT_NAME = 腾讯科技树 #项目名
+DEFAULT_TIMEZONE = Asia/Shanghai #默认时区
+DEFAULT_LANG = zh-cn #默认语言
+TOKEN_KEY=EQD97HePTgaNa0r4p0kS4RIV2T6GGV7P #登录加密key
+TOKEN_TIME=86400 #登录TOKEN过期时间
+DELAY_TIME=300 #登录TOKEN延迟时间
+
 [DATABASE] #数据库配置
 TYPE = mysql #数据库类型
 HOSTNAME = 127.0.0.1 #数据库地址

@@ -4,7 +4,9 @@ namespace app\repository;
 
 use app\model\Event;
 use app\repository\BaseRepository;
+use app\service\TokenService;
 use think\facade\Cache;
+use think\facade\Request;
 
 trait CommonTrait
 {
