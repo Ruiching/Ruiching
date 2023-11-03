@@ -140,9 +140,9 @@ class MyselfLog implements LogHandlerInterface
             $info[$type] = $message;
         }
 
-        if ($info) {
-            return $this->write($info, $destination);
-        }
+//        if ($info) {
+//            return $this->write($info, $destination);
+//        }
 
         return true;
     }
