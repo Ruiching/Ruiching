@@ -28,7 +28,7 @@ class LogMiddleware
             '==============================================================',
         ];
         $logInfo = implode(PHP_EOL, $logInfo) . PHP_EOL;
-        Log::record($logInfo, 'info');
+        Log::info($logInfo);
         return $next($request);
     }
 }
