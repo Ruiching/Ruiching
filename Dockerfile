@@ -27,7 +27,6 @@ RUN sed -i '2,3d' /usr/local/etc/php/conf.d/docker-vars.ini && \
 echo "post_max_size=60m" >> /usr/local/etc/php/conf.d/docker-vars.ini && \
 echo "upload_max_filesize=30M" >> /usr/local/etc/php/conf.d/docker-vars.ini && \
 echo "error_log=/proc/self/fd/2" >> /usr/local/etc/php/conf.d/docker-vars.ini && \
-echo "error_log=/proc/self/fd/2" >> /usr/local/etc/php/conf.d/docker-vars.ini && \
 echo "php_admin_value[error_reporting] = E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED" >> /usr/local/etc/php-fpm.conf
 
 # 安装依赖
