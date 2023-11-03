@@ -21,6 +21,8 @@ class Login extends BaseController
 
     public function index(Request $request)
     {
+        file_put_contents('php://stdout', 'Hello world');
+
         if($request::isPost()) {
             $validate = Validate::rule([
                 'username|账号'  => 'require',
