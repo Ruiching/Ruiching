@@ -122,6 +122,8 @@ class MyselfLog implements LogHandlerInterface
                     sprintf($this->config['format'], $time, $type, $msg);
             }
 
+            array_unshift($message, "---------------------------------------------------------------\r\n[{$time}] {$requestInfo['ip']} {$requestInfo['method']} {$requestInfo['host']}{$requestInfo['uri']}");
+
             //独立日志
 
 //            if (true === $this->config['apart_level'] || in_array($type, $this->config['apart_level'])) {
@@ -218,12 +220,10 @@ class MyselfLog implements LogHandlerInterface
         $info = [];
 
         foreach ($message as $type => $msg) {
-            if (!in_array($type, $this->config['level']) || empty($this->config['level'])) {
-                continue;
+            if (in_array($type, $this->config['level']) && !empty($this->config['level'])) {
+                $info[$type] = is_array($msg) ? implode(PHP_EOL, $msg) : $msg;
             }
-            $info[$type] = is_array($msg) ? implode(PHP_EOL, $msg) : $msg;
         }
-
 
         $message = implode(PHP_EOL, $info) . PHP_EOL;
 
