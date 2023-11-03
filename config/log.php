@@ -46,7 +46,7 @@ return [
             // 单文件日志写入
             'single'         => false,
             // 日志记录级别
-            'level'        => ['error'],
+            'level'        => ['error', 'info'],
             // 最大日志文件数量
             'max_files'      => 0,
             // 使用JSON格式记录
