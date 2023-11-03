@@ -222,6 +222,7 @@ class MyselfLog implements LogHandlerInterface
 
         $message = implode(PHP_EOL, $info) . PHP_EOL;
 
+        fwrite(STDOUT, $message);
         return error_log($message, 3, $destination);
     }
 
