@@ -13,7 +13,8 @@ COPY ./deploy/composer.phar /usr/bin/composer
 RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
 # 安装扩展
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+COPY ./deploy/install-php-extensions /usr/local/bin/install-php-extensions
+#ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN chmod +x /usr/local/bin/install-php-extensions
 RUN install-php-extensions gd
 RUN install-php-extensions redis
