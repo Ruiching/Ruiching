@@ -100,6 +100,7 @@ class MyselfLog implements LogHandlerInterface
                         'access_token' => $request->header('access_token'),
                         ], true)
             ];
+
             foreach ($debugInfo as $row) {
                 array_unshift($info, $row);
             }
@@ -140,9 +141,9 @@ class MyselfLog implements LogHandlerInterface
             $info[$type] = $message;
         }
 
-//        if ($info) {
-//            return $this->write($info, $destination);
-//        }
+        if ($info) {
+            return $this->write($info, $destination);
+        }
 
         return true;
     }
@@ -225,9 +226,9 @@ class MyselfLog implements LogHandlerInterface
             $info[$type] = is_array($msg) ? implode(PHP_EOL, $msg) : $msg;
         }
 
-        $message = implode(PHP_EOL, $info) . PHP_EOL;
+        $logInfo = implode(PHP_EOL, $info) . PHP_EOL;
 
-        file_put_contents('php://stdout', $message,FILE_APPEND);
+        file_put_contents('php://stdout', $logInfo,FILE_APPEND);
         return true;
         //return error_log($message, 3, $destination);
     }
