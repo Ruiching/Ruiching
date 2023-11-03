@@ -131,7 +131,7 @@ class MyselfLog implements LogHandlerInterface
 
             if (true === $this->config['apart_level'] || in_array($type, $this->config['apart_level'])) {
                 //这一句很关键，可以给mysql或者其他独立的日志，也加上请求和时间等信息
-                array_unshift($message, "---------------------------------------------------------------\r\n[{$time}] {$requestInfo['ip']} {$requestInfo['method']} {$requestInfo['host']}{$requestInfo['uri']}");
+                array_unshift($message, "---------------------------------------------------------------\r\n[{$time}] [$type] {$requestInfo['ip']} {$requestInfo['method']} {$requestInfo['host']}{$requestInfo['uri']}");
                 // 独立记录的日志级别
                 $filename = $this->getApartLevelFile($path, $type);
                 $this->write($message, $filename);
