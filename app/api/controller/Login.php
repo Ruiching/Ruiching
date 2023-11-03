@@ -5,12 +5,19 @@ namespace app\api\controller;
 
 use app\BaseController;
 use app\service\TokenService;
+use think\App;
 use think\facade\Request;
 use think\facade\Validate;
 use think\facade\View;
 
 class Login extends BaseController
 {
+    public function __construct(App $app)
+    {
+        parent::__construct($app);
+        header('Access-Control-Allow-Origin:*');
+    }
+
     public function index(Request $request)
     {
         if($request::isPost()) {
