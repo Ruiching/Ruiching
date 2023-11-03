@@ -37,7 +37,7 @@ class Auth extends BaseController
         }
 
         $loginToken = env('app.user_login_token');
-        if ($token != $loginToken) {
+        if ($res['uuid'] != $loginToken) {
             return error("登录账号错误", 401);
         }
     }
