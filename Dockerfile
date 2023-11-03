@@ -36,5 +36,5 @@ RUN rm -rf .git && rm -rf .idea
 
 EXPOSE 8899
 
-CMD ["php-fpm", "--nodaemon", "-R"]
+ENTRYPOINT ["php-fpm", "--nodaemon", "-R"]
 
