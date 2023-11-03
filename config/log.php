@@ -11,7 +11,7 @@ return [
     // 日志类型记录的通道 ['error'=>'email',...]
     'type_channel' => [],
     // 关闭全局日志写入
-    'close'        => false,
+    'close'        => true,
     // 全局日志处理 支持闭包
     'processor'    => null,
 
@@ -25,7 +25,7 @@ return [
             // 单文件日志写入
             'single'         => false,
             // 独立日志级别
-            'apart_level'    => ['error', 'sql', 'info'],
+            'apart_level'    => ['error'],
             // 最大日志文件数量
             'max_files'      => 30,
             // 使用JSON格式记录

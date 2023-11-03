@@ -17,7 +17,7 @@ class LogMiddleware
     public function handle($request, \Closure $next)
     {
         $url = $request->url(true);
-        if (strpos($url, 'admin') === false) {
+        if (strpos($url, 'admin') !== false) {
             return $next($request);
         }
         $host = $request->ip() . ' ' . $request->method() . ' ' . $url;
@@ -28,7 +28,7 @@ class LogMiddleware
             '==============================================================',
         ];
         $logInfo = implode(PHP_EOL, $logInfo) . PHP_EOL;
-        Log::info($logInfo);
+        pt($logInfo, false,'api');
         return $next($request);
     }
 }
