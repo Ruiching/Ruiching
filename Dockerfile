@@ -36,5 +36,5 @@ RUN rm -rf .git && rm -rf .idea
 
 EXPOSE 8899
 
-ENTRYPOINT ["php-fpm", "--nodaemon", "-R"]
+ENTRYPOINT ["nginx", "--nodaemon", "-R"]
 
