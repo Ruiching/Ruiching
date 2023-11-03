@@ -16,6 +16,7 @@ class Index extends Auth
     {
         parent::__construct($app, $request);
         header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
         $this->repository = new IndexRepository();
     }
 

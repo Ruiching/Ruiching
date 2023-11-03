@@ -16,6 +16,7 @@ class Login extends BaseController
     {
         parent::__construct($app);
         header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
     }
 
     public function index(Request $request)

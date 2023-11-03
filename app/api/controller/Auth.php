@@ -20,6 +20,7 @@ class Auth extends BaseController
 
         //获取请求头中的token
         header('Access-Control-Allow-Origin:*');
+        header('Access-Control-Allow-Headers:*');
 
         $authorization = $request::header('authorization');
         if (empty($authorization)) {
