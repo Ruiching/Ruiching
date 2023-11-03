@@ -22,16 +22,7 @@ class Auth extends BaseController
         header('Access-Control-Allow-Origin:*');
         header('Access-Control-Allow-Headers:*');
 
-        $authorization = $request::header('authorization');
-        if (empty($authorization)) {
-            return error("登录未授权", 401);
-        }
-        if (strpos($authorization, 'Bearer') === false) {
-            return error("登录未授权", 401);
-        }
-
-        //验证token
-        $token = str_replace('Bearer ', '', $authorization);
+        $token = $request::param('access_token');
         $res = TokenService::verifyToken($token);
         if (!$res) {
             return error("登录未授权", 401);
