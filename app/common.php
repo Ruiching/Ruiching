@@ -43,7 +43,7 @@ function success($msg, $data = [])
     ];
     $jsonResponse = json($response, 200, [
         'Access-Control-Allow-Origin' => '*',
-        'Access-Control-Allow-Headers' => 'x-requested-with,content-type',
+        'Access-Control-Allow-Headers' => 'x-requested-with,content-type,Authorization',
         'Access-Control-Allow-Methods' => 'POST,GET,OPTIONS,DELETE'
     ]);
     throw new \think\exception\HttpResponseException($jsonResponse);
@@ -64,7 +64,7 @@ function error($msg = '', $code = 110, $data = [])
     ];
     $jsonResponse = json($response, 200, [
         'Access-Control-Allow-Origin' => '*',
-        'Access-Control-Allow-Headers' => 'x-requested-with,content-type',
+        'Access-Control-Allow-Headers' => 'x-requested-with,content-type,Authorization',
         'Access-Control-Allow-Methods' => 'POST,GET,OPTIONS,DELETE'
     ]);
     throw new \think\exception\HttpResponseException($jsonResponse);
