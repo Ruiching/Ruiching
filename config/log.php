@@ -44,9 +44,9 @@ return [
             // 日志保存目录
             'path'           => '',
             // 单文件日志写入
-            'single'         => false,
-            // 日志记录级别
-            'level'        => ['error', 'info'],
+            'single'         => true,
+            // 独立日志级别
+            'apart_level'        => ['error', 'info'],
             // 最大日志文件数量
             'max_files'      => 0,
             // 使用JSON格式记录

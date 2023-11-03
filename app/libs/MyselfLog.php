@@ -24,8 +24,7 @@ class MyselfLog implements LogHandlerInterface
         'single' => false,
         'file_size' => 2097152,
         'path' => '',
-        //'apart_level' => [],
-        'level' => [],
+        'apart_level' => [],
         'max_files' => 0,
         'json' => false,
         'json_options' => JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
@@ -122,18 +121,14 @@ class MyselfLog implements LogHandlerInterface
                     sprintf($this->config['format'], $time, $type, $msg);
             }
 
-            array_unshift($message, "---------------------------------------------------------------\r\n[{$time}] {$requestInfo['ip']} {$requestInfo['method']} {$requestInfo['host']}{$requestInfo['uri']}");
-
-            //独立日志
-
-//            if (true === $this->config['apart_level'] || in_array($type, $this->config['apart_level'])) {
-//                //这一句很关键，可以给mysql或者其他独立的日志，也加上请求和时间等信息
-//                array_unshift($message, "---------------------------------------------------------------\r\n[{$time}] {$requestInfo['ip']} {$requestInfo['method']} {$requestInfo['host']}{$requestInfo['uri']}");
-//                // 独立记录的日志级别
-//                $filename = $this->getApartLevelFile($path, $type);
-//                $this->write($message, $filename);
-//                continue;
-//            }
+            if (true === $this->config['apart_level'] || in_array($type, $this->config['apart_level'])) {
+                //这一句很关键，可以给mysql或者其他独立的日志，也加上请求和时间等信息
+                array_unshift($message, "---------------------------------------------------------------\r\n[{$time}] {$requestInfo['ip']} {$requestInfo['method']} {$requestInfo['host']}{$requestInfo['uri']}");
+                // 独立记录的日志级别
+                $filename = $this->getApartLevelFile($path, $type);
+                $this->write($message, $filename);
+                continue;
+            }
 
             $info[$type] = $message;
         }
@@ -220,9 +215,7 @@ class MyselfLog implements LogHandlerInterface
         $info = [];
 
         foreach ($message as $type => $msg) {
-            if (in_array($type, $this->config['level']) && !empty($this->config['level'])) {
-                $info[$type] = is_array($msg) ? implode(PHP_EOL, $msg) : $msg;
-            }
+            $info[$type] = is_array($msg) ? implode(PHP_EOL, $msg) : $msg;
         }
 
         $message = implode(PHP_EOL, $info) . PHP_EOL;
