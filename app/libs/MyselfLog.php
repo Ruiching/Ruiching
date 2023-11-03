@@ -91,7 +91,14 @@ class MyselfLog implements LogHandlerInterface
 
             $debugInfo = [
                 'param' => '[ PARAM ] ' . var_export($request->param(), true),
-//                'header' => '[ HEADER ] ' . var_export($request->header(), true)
+                'header' => '[ HEADER ] ' . var_export([
+                        'host' => $request->header('host'),
+                        'user-agent' => $request->header('user-agent'),
+                        'accept-language' => $request->header('accept-language'),
+                        'content-type' => $request->header('content-type'),
+                        'content-length' => $request->header('content-length'),
+                        'access_token' => $request->header('access_token'),
+                        ], true)
             ];
             foreach ($debugInfo as $row) {
                 array_unshift($info, $row);
