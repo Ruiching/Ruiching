@@ -28,15 +28,6 @@ class UpdateEventMap extends Command
     {
         $output->writeln('更新事件分布地图开始');
 
-        //加redis锁
-        $rLock = new RedisLock();
-        $lockName = "update_event_map_redis_lock";
-        $identifier = $rLock->getLock($lockName);
-        if ($identifier === false) {
-            $output->writeln("系统繁忙");
-            exit();
-        }
-
         $map = [];
         $repository = new BaseRepository();
         $fields = $repository->eventFieldModel->group('level_1_name')->column('level_1_name');
@@ -60,7 +51,6 @@ class UpdateEventMap extends Command
         }
         Cache::set('event_map', $map, 86400);
 
-        $rLock->releaseLock($lockName, $identifier);
         $output->writeln('更新事件分布地图结束');
     }
 }
