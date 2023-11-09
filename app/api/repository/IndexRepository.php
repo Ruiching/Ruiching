@@ -112,7 +112,7 @@ class IndexRepository extends BaseRepository
             ->column('name');
     }
 
-    public function getEventList($params)
+   /* public function getEventList($params)
     {
         $eventMaxNumber = !empty($params['max_number']) ? intval($params['max_number']) : 200;
         if ($eventMaxNumber > 500) {
@@ -224,9 +224,9 @@ class IndexRepository extends BaseRepository
         }
 
         return $lists;
-    }
+    }*/
 
-    public function getEventListV2($params)
+    /*public function getEventListV2($params)
     {
         $events = [];
         $minTime = $maxTime = [
@@ -331,7 +331,7 @@ class IndexRepository extends BaseRepository
             'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
             'count' => count($eventIds),
         ];
-    }
+    }*/
 
     public function getEventListV3($params)
     {
@@ -387,7 +387,9 @@ class IndexRepository extends BaseRepository
             'sort' => 0,
         ];
         if (!empty($eventIds)) {
-            $lists = $this->eventModel->where('event_id', 'in', $eventIds)->select();
+            $lists = $this->eventModel->where('event_id', 'in', $eventIds)
+                ->field('event_id, formated_time, time, name, object')
+                ->select();
             foreach ($lists as $listItem) {
                 $item = $this->_handlerEventItem($listItem);
 
