@@ -388,7 +388,7 @@ class IndexRepository extends BaseRepository
         ];
         if (!empty($eventIds)) {
             $lists = $this->eventModel->where('event_id', 'in', $eventIds)
-                ->field('event_id, formated_time, time, name, object')
+                ->field('event_id, formated_time, timestamp, time, name, object')
                 ->select();
             foreach ($lists as $listItem) {
                 $item = $this->_handlerEventItem($listItem);
