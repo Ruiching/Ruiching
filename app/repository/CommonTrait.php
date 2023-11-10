@@ -54,11 +54,6 @@ trait CommonTrait
         return $year * 372 - 31 - 1;
     }
 
-    public function _getTimeYear($timestamp)
-    {
-        return ($timestamp + 31 + 1) / 372;
-    }
-
     public function _queryAllEventV1($params)
     {
         $query = $this->eventModel
@@ -348,7 +343,7 @@ trait CommonTrait
         //整理数据
         return [
             'event_id' => $eventInfo['event_id'],
-            'year' => $this->_getTimeYear($eventInfo['timestamp']),
+            'year' => $this->_handlerEventTimeToYear($eventInfo['formated_time']),
             'time' => $eventInfo['time'],
             'name' => $eventInfo['name'],
             'object' => $eventInfo['object'],
