@@ -388,7 +388,7 @@ class IndexRepository extends BaseRepository
         ];
         if (!empty($eventIds)) {
             $lists = $this->eventModel->where('event_id', 'in', $eventIds)
-                ->field('event_id, formated_time, time, name, object')
+                ->field('event_id, timestamp, time, name, object')
                 ->select();
             foreach ($lists as $listItem) {
                 $item = $this->_handlerEventItem($listItem);
@@ -396,25 +396,25 @@ class IndexRepository extends BaseRepository
                 //年份数据
                 if (empty($minTime['sort'])) {
                     $minTime = [
-                        'year' => $listItem['formated_time'],
+                        'year' => $listItem['timestamp'],
                         'sort' => $listItem['timestamp'],
                     ];
                 }
                 if (empty($maxTime['sort'])) {
                     $maxTime = [
-                        'year' => $listItem['formated_time'],
+                        'year' => $listItem['timestamp'],
                         'sort' => $listItem['timestamp'],
                     ];
                 }
-                if ($minTime['sort'] > $listItem['timestamp'] && !empty($listItem['formated_time'])) {
+                if ($minTime['sort'] > $listItem['timestamp'] && !empty($listItem['timestamp'])) {
                     $minTime = [
-                        'year' => $listItem['formated_time'],
+                        'year' => $listItem['timestamp'],
                         'sort' => $listItem['timestamp'],
                     ];
                 }
-                if ($maxTime['sort'] < $listItem['timestamp'] && !empty($listItem['formated_time'])) {
+                if ($maxTime['sort'] < $listItem['timestamp'] && !empty($listItem['timestamp'])) {
                     $maxTime = [
-                        'year' => $listItem['formated_time'],
+                        'year' => $listItem['timestamp'],
                         'sort' => $listItem['timestamp'],
                     ];
                 }
@@ -433,8 +433,8 @@ class IndexRepository extends BaseRepository
             'events' => $events,
             'start_time' => $minTime['year'],
             'end_time' => $maxTime['year'],
-            'startYear' => $this->_handlerEventTimeToYear($minTime['year']),
-            'endYear' => $this->_handlerEventTimeToYear($maxTime['year']),
+            'startYear' => $this->_getTimeYear($minTime['timestamp']),
+            'endYear' => $this->_getTimeYear($maxTime['timestamp']),
             'count' => count($eventIds),
         ];
     }
