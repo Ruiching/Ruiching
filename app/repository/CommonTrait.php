@@ -46,7 +46,7 @@ trait CommonTrait
                 $year = $first + $second;
             }
         }
-        return $year;
+        return intval($year);
     }
 
     public function _getTimestamp($year)
