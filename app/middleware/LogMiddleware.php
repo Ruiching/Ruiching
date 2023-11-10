@@ -28,7 +28,7 @@ class LogMiddleware
             '==============================================================',
         ];
         $logInfo = implode(PHP_EOL, $logInfo) . PHP_EOL;
-        pt($logInfo, false,'api');
+        Log::channel('file')->info($logInfo);
         return $next($request);
     }
 }

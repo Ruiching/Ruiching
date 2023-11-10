@@ -229,8 +229,7 @@ class MyselfLog implements LogHandlerInterface
         $logInfo = implode(PHP_EOL, $info) . PHP_EOL;
 
         file_put_contents('php://stdout', $logInfo,FILE_APPEND);
-        return true;
-        //return error_log($message, 3, $destination);
+        return error_log($logInfo, 3, $destination);
     }
 
     /**
