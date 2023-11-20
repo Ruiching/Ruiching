@@ -392,6 +392,9 @@ class IndexRepository extends BaseRepository
                 ->select();
             foreach ($lists as $listItem) {
                 $item = $this->_handlerEventItem($listItem);
+                if (empty($item)) {
+                    continue;
+                }
 
                 //年份数据
                 if (empty($minTime['sort'])) {

@@ -340,6 +340,10 @@ trait CommonTrait
             ->where('et.event_id', $eventInfo['event_id'])
             ->column('t.name');
 
+        if (empty($fieldInfo['level_1_name'])) {
+            return false;
+        }
+
         //整理数据
         return [
             'event_id' => $eventInfo['event_id'],
