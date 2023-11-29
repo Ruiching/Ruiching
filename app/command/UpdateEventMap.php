@@ -57,6 +57,6 @@ class UpdateEventMap extends Command
         }
         Cache::set('event_map', $map, 86400);
         $end = microtime(true);
-        $output->writeln("更新事件分布地图结束，耗时" . floor(($end - $start) * 1000) . "ms");
+        $output->writeln("更新事件分布地图结束，耗时" . floor(($end - $start) / 60) . "min");
     }
 }
