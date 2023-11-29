@@ -10,5 +10,5 @@ use think\Model;
  */
 class EventField extends Model
 {
-    protected $table = 'event__field';
+    const TABLE_NAME = 'event__field';
 }

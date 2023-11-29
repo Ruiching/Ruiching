@@ -5,6 +5,7 @@ namespace app\command;
 
 use app\libs\RedisLock;
 use app\model\Event;
+use app\model\EventField;
 use app\repository\BaseRepository;
 use app\repository\CommonTrait;
 use think\console\Command;
@@ -33,20 +34,21 @@ class UpdateEventMap extends Command
         $fields = $repository->eventFieldModel->group('level_1_name')->column('level_1_name');
         foreach ($fields as $field) {
             $map[$field] = [];
-            $eventIds = $repository->eventFieldModel->where('level_1_name', $field)->column('event_id');
-            if (!empty($eventIds)) {
-                // 根据时间进行分组
-                $mixTime = Event::START_YEAR;
-                $maxTime = Event::END_YEAR + 40;
-                for ($i = $mixTime; $i <= $maxTime; $i += 100) {
-                    $eventCount = $repository->eventModel
-                        ->whereIn('event_id', $eventIds)
-                        ->whereNotNull('timestamp')
-                        ->where('timestamp', '>=', $this->_getTimestamp($i))
-                        ->where('timestamp', '<', $this->_getTimestamp($i + 100))
-                        ->count();
-                    $map[$field][$i] = empty($eventCount) ? 0 : intval($eventCount);
-                }
+            // 根据时间进行分组
+            $mixTime = Event::START_YEAR;
+            $maxTime = Event::END_YEAR + 40;
+            for ($i = $mixTime; $i <= $maxTime; $i += 100) {
+                $startTime = $this->_getTimestamp($i);
+                $endTime = $this->_getTimestamp($i + 100);
+                $eventCount = $repository->eventModel->alias('e')
+                    ->leftJoin(EventField::TABLE_NAME ." ef", 'ef.event_id = e.id')
+                    ->where('ef.level_1_name', $field)
+                    ->whereNotNull('e.timestamp')
+                    ->where('e.timestamp', '>=', $startTime)
+                    ->where('e.timestamp', '<', $endTime)
+                    ->count();
+                $map[$field][$i] = empty($eventCount) ? 0 : intval($eventCount);
+                $output->writeln("学科：{$field}，时间范围：{$startTime} ~ {$endTime} 内有 {$eventCount} 个事件");
             }
         }
         Cache::set('event_map', $map, 86400);
