@@ -28,6 +28,7 @@ class UpdateEventMap extends Command
     protected function execute(Input $input, Output $output)
     {
         $output->writeln('更新事件分布地图开始');
+        $start = microtime(true);
 
         $map = [];
         $repository = new BaseRepository();
@@ -55,7 +56,7 @@ class UpdateEventMap extends Command
             }
         }
         Cache::set('event_map', $map, 86400);
-
-        $output->writeln('更新事件分布地图结束');
+        $end = microtime(true);
+        $output->writeln("更新事件分布地图结束，耗时" . floor(($end - $start) * 1000) . "ms");
     }
 }
