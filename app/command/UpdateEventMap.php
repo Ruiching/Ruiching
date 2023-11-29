@@ -33,6 +33,9 @@ class UpdateEventMap extends Command
         $repository = new BaseRepository();
         $fields = $repository->eventFieldModel->group('level_1_name')->column('level_1_name');
         foreach ($fields as $field) {
+            if (empty($field)) {
+                continue;
+            }
             $map[$field] = [];
             // 根据时间进行分组
             $mixTime = Event::START_YEAR;
@@ -41,9 +44,9 @@ class UpdateEventMap extends Command
                 $startTime = $this->_getTimestamp($i);
                 $endTime = $this->_getTimestamp($i + 100);
                 $eventCount = $repository->eventModel->alias('e')
-                    ->leftJoin("event__field as ef", 'ef.event_id = e.id')
-                    ->where('ef.level_1_name', $field)
+                    ->leftJoin("event__field ef", 'ef.event_id = e.id')
                     ->whereNotNull('e.timestamp')
+                    ->where('ef.level_1_name', $field)
                     ->where('e.timestamp', '>=', $startTime)
                     ->where('e.timestamp', '<', $endTime)
                     ->count();
