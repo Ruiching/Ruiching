@@ -41,7 +41,7 @@ class UpdateEventMap extends Command
                 $startTime = $this->_getTimestamp($i);
                 $endTime = $this->_getTimestamp($i + 100);
                 $eventCount = $repository->eventModel->alias('e')
-                    ->leftJoin(EventField::TABLE_NAME ." ef", 'ef.event_id = e.id')
+                    ->leftJoin("event__field as ef", 'ef.event_id = e.id')
                     ->where('ef.level_1_name', $field)
                     ->whereNotNull('e.timestamp')
                     ->where('e.timestamp', '>=', $startTime)
