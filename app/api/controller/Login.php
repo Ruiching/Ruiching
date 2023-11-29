@@ -19,10 +19,13 @@ class Login extends BaseController
         header('Access-Control-Allow-Headers:*');
     }
 
+    public function times()
+    {
+        return "Hello world!!" . date('Y-m-d H:i:s', time());
+    }
+
     public function index(Request $request)
     {
-        file_put_contents('php://stdout', 'Hello world');
-
         if($request::isPost()) {
             $validate = Validate::rule([
                 'username|账号'  => 'require',
