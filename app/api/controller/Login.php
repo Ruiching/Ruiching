@@ -19,11 +19,6 @@ class Login extends BaseController
         header('Access-Control-Allow-Headers:*');
     }
 
-    public function times()
-    {
-        return "Hello world!!" . date('Y-m-d H:i:s', time());
-    }
-
     public function index(Request $request)
     {
         if($request::isPost()) {
